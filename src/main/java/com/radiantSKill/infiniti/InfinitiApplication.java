@@ -1,13 +1,13 @@
-package com.radiantSKill.Infinity;
+package com.radiantSKill.infiniti;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ApplicationSourceApplication {
+public class InfinitiApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ApplicationSourceApplication.class, args);
+		SpringApplication.run(InfinitiApplication.class, args);
 	}
 
 }
