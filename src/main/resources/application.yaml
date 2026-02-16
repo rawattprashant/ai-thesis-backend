@@ -8,10 +8,16 @@ spring:
 #  main:
 #    web-application-type: reactive
 
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/rawat
+#    username: rawat
+#    password: Postgres@231
+#    driver-class-name: org.postgresql.Driver
+
   datasource:
-    url: jdbc:postgresql://localhost:5432/rawat
-    username: rawat
-    password: Postgres@231
+    url: jdbc:postgresql://68.178.175.48:5432/rdsappdb
+    username: rdsappuser
+    password: rdsapprd@123
     driver-class-name: org.postgresql.Driver
 
   jpa:
