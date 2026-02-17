@@ -21,6 +21,12 @@ public class ThesisController {
     public ResponseEntity<?> registerThesis(
             @RequestBody ThesisRegistrationRequest request,
             Authentication auth) {
+
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(401)
+                    .body("Unauthorized: Please login first");
+        }
+
         thesisService.saveThesisRegistration(auth.getName(), request);
         return ResponseEntity.ok("Thesis registration saved");
     }
@@ -30,6 +36,10 @@ public class ThesisController {
     public ResponseEntity<?> saveProofOfConcept(
             @RequestBody ProofOfConceptRequest request,
             Authentication auth) {
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(401)
+                    .body("Unauthorized: Please login first");
+        }
         thesisService.saveProofOfConcept(auth.getName(), request);
         return ResponseEntity.ok("Proof of Concept saved");
     }
@@ -40,6 +50,10 @@ public class ThesisController {
             @RequestParam("description") String description,
             @RequestParam("file") MultipartFile file,
             Authentication auth) {
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(401)
+                    .body("Unauthorized: Please login first");
+        }
         thesisService.uploadDigitalPrototype(auth.getName(), description, file);
         return ResponseEntity.ok("Digital prototype uploaded");
     }
@@ -50,6 +64,10 @@ public class ThesisController {
             @RequestParam("summary") String summary,
             @RequestParam("file") MultipartFile file,
             Authentication auth) {
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(401)
+                    .body("Unauthorized: Please login first");
+        }
         thesisService.uploadFinancialModel(auth.getName(), summary, file);
         return ResponseEntity.ok("Financial model uploaded");
     }
@@ -59,6 +77,10 @@ public class ThesisController {
     public ResponseEntity<?> uploadPresentation(
             @RequestParam("file") MultipartFile file,
             Authentication auth) {
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(401)
+                    .body("Unauthorized: Please login first");
+        }
         thesisService.uploadPresentation(auth.getName(), file);
         return ResponseEntity.ok("Presentation uploaded");
     }
@@ -68,6 +90,10 @@ public class ThesisController {
     public ResponseEntity<?> uploadSelfieVideo(
             @RequestParam("file") MultipartFile file,
             Authentication auth) {
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(401)
+                    .body("Unauthorized: Please login first");
+        }
         thesisService.uploadSelfieVideo(auth.getName(), file);
         return ResponseEntity.ok("Selfie video uploaded");
     }

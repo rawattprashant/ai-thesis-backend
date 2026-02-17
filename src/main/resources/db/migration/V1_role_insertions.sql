@@ -1,0 +1,3 @@
+--INSERT INTO role (name, role_description) VALUES ('STUDENT', 'Students');
+--INSERT INTO role (name, role_description) VALUES ('ADMIN', 'Admin');
+--INSERT INTO role (name, role_description) VALUES ('TEACHER', 'Teachers');
