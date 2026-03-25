@@ -22,22 +22,31 @@ public class AuthController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequestDTO request) {
+    public ResponseEntity<Map<String, String>> register(@RequestBody RegisterRequestDTO request) {
         userService.registerUser(request);
-        return ResponseEntity.ok("User registered successfully");
+        return ResponseEntity.ok(
+                Map.of(
+                        "status", "success",
+                        "message", "User registered successfully"
+                )
+        );
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest loginRequest) {
-
+    public ResponseEntity<Map<String, String>> login (@RequestBody LoginRequest loginRequest){
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
-                        loginRequest.getPassword()
-                )
+                            loginRequest.getEmail(),
+                            loginRequest.getPassword()
+                    )
         );
 
         String token = jwtUtil.generateToken(loginRequest.getEmail());
-        return ResponseEntity.ok(Map.of("token", token));
+        return ResponseEntity.ok(
+                Map.of(
+                        "status", "success",
+                        "token", token
+                )
+        );
     }
 }
