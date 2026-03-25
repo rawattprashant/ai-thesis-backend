@@ -9,6 +9,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/student/thesis")
 @RequiredArgsConstructor
@@ -24,11 +26,19 @@ public class ThesisController {
 
         if (auth == null || !auth.isAuthenticated()) {
             return ResponseEntity.status(401)
-                    .body("Unauthorized: Please login first");
+                    .body(Map.of(
+                            "status", "error",
+                            "message", "Unauthorized: Please login first"
+                    ));
         }
 
         thesisService.saveThesisRegistration(auth.getName(), request);
-        return ResponseEntity.ok("Thesis registration saved");
+        return ResponseEntity.ok(
+                Map.of(
+                        "status", "success",
+                        "message", "Thesis registration saved"
+                )
+        );
     }
 
     // 2️⃣ Proof of Concept
@@ -38,10 +48,17 @@ public class ThesisController {
             Authentication auth) {
         if (auth == null || !auth.isAuthenticated()) {
             return ResponseEntity.status(401)
-                    .body("Unauthorized: Please login first");
+                    .body(Map.of(
+                            "status", "error",
+                            "message", "Unauthorized: Please login first"
+                    ));
         }
         thesisService.saveProofOfConcept(auth.getName(), request);
-        return ResponseEntity.ok("Proof of Concept saved");
+        return ResponseEntity.ok(
+                Map.of(
+                        "status", "success",
+                        "message", "Proof of Concept saved"
+                ));
     }
 
     // 3️⃣ Digital Prototype (optional)
@@ -52,10 +69,17 @@ public class ThesisController {
             Authentication auth) {
         if (auth == null || !auth.isAuthenticated()) {
             return ResponseEntity.status(401)
-                    .body("Unauthorized: Please login first");
+                    .body(Map.of(
+                            "status", "error",
+                            "message", "Unauthorized: Please login first"
+                    ));
         }
         thesisService.uploadDigitalPrototype(auth.getName(), description, file);
-        return ResponseEntity.ok("Digital prototype uploaded");
+        return ResponseEntity.ok(
+                Map.of(
+                        "status", "success",
+                        "message", "Digital prototype uploaded"
+                ));
     }
 
     // 4️⃣ Financial Model (mandatory)
@@ -66,10 +90,17 @@ public class ThesisController {
             Authentication auth) {
         if (auth == null || !auth.isAuthenticated()) {
             return ResponseEntity.status(401)
-                    .body("Unauthorized: Please login first");
+                    .body(Map.of(
+                            "status", "error",
+                            "message", "Unauthorized: Please login first"
+                    ));
         }
         thesisService.uploadFinancialModel(auth.getName(), summary, file);
-        return ResponseEntity.ok("Financial model uploaded");
+        return ResponseEntity.ok(
+                Map.of(
+                        "status", "success",
+                        "message", "Financial model uploaded"
+                ));
     }
 
     // 5️⃣ Thesis Presentation
@@ -79,10 +110,17 @@ public class ThesisController {
             Authentication auth) {
         if (auth == null || !auth.isAuthenticated()) {
             return ResponseEntity.status(401)
-                    .body("Unauthorized: Please login first");
+                    .body(Map.of(
+                            "status", "error",
+                            "message", "Unauthorized: Please login first"
+                    ));
         }
         thesisService.uploadPresentation(auth.getName(), file);
-        return ResponseEntity.ok("Presentation uploaded");
+        return ResponseEntity.ok(
+                Map.of(
+                        "status", "success",
+                        "message", "Presentation uploaded"
+                ));
     }
 
     // 6️⃣ Selfie Video
@@ -92,9 +130,16 @@ public class ThesisController {
             Authentication auth) {
         if (auth == null || !auth.isAuthenticated()) {
             return ResponseEntity.status(401)
-                    .body("Unauthorized: Please login first");
+                    .body(Map.of(
+                            "status", "error",
+                            "message", "Unauthorized: Please login first"
+                    ));
         }
         thesisService.uploadSelfieVideo(auth.getName(), file);
-        return ResponseEntity.ok("Selfie video uploaded");
+        return ResponseEntity.ok(
+                Map.of(
+                        "status", "success",
+                        "message", "Selfie video uploaded"
+                ));
     }
 }
