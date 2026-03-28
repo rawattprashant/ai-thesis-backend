@@ -1,7 +1,9 @@
 package com.radiantSKill.infiniti.controllers;
 
 import com.radiantSKill.infiniti.dto.ProofOfConceptRequest;
+import com.radiantSKill.infiniti.dto.ResearchRequest;
 import com.radiantSKill.infiniti.dto.ThesisRegistrationRequest;
+import com.radiantSKill.infiniti.services.ThesisResearchService;
 import com.radiantSKill.infiniti.services.ThesisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.util.Map;
 
 @RestController
@@ -16,6 +19,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ThesisController {
 
+    private final ThesisResearchService thesisResearchService;
     private final ThesisService thesisService;
 
     // 1️⃣ Thesis Registration
@@ -37,6 +41,30 @@ public class ThesisController {
                 Map.of(
                         "status", "success",
                         "message", "Thesis registration saved"
+                )
+        );
+    }
+
+    //Thesis-Research
+    @PostMapping("/research")
+    public ResponseEntity<?> saveResearch(
+            @RequestBody @Valid ResearchRequest request,
+            Authentication auth) {
+
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(401)
+                    .body(Map.of(
+                            "status", "error",
+                            "message", "Unauthorized: Please login first"
+                    ));
+        }
+
+        thesisResearchService.saveOrUpdateResearch(auth.getName(), request);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "status", "success",
+                        "message", "Research milestone saved"
                 )
         );
     }
