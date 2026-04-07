@@ -1,6 +1,7 @@
 package com.radiantSKill.infiniti.services;
 
 import com.radiantSKill.infiniti.dto.RegisterRequestDTO;
+import com.radiantSKill.infiniti.dto.UserResponseDTO;
 import com.radiantSKill.infiniti.entity.AppUser;
 import com.radiantSKill.infiniti.entity.Role;
 import com.radiantSKill.infiniti.entity.StudentSubmissionStore;
@@ -47,6 +48,21 @@ public class UserService {
             studentSubmissionStore.setSubmissionStatus("DRAFT");
             studentSubmissionRepository.save(studentSubmissionStore);
         }
+    }
+
+    public UserResponseDTO getUserByEmail(String email) {
+
+        AppUser user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        UserResponseDTO dto = new UserResponseDTO();
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
+        dto.setEmail(user.getEmail());
+        dto.setPhone(user.getPhone());
+        dto.setStatus(user.getStatus());
+
+        return dto;
     }
 }
 

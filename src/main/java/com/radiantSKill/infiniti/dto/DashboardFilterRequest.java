@@ -11,8 +11,8 @@ public class DashboardFilterRequest {
 
     private String section;
 
-    private Boolean digitalPrototype;
+    private String digitalPrototype;
 
-    private Boolean investment;
+    private String investment;
 
 }

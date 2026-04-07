@@ -18,11 +18,15 @@ public class ThesisResearch {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "thesis_id", nullable = false, unique = true)
-    private Long thesisId;
+    // ✅ Student mapping
+    @ManyToOne
+    @JoinColumn(name = "student_id", nullable = false, unique = true)
+    private AppUser student;
 
-    @Column(nullable = false)
-    private String topic;
+    // ✅ Topic mapping (this replaces thesisId + topic)
+    @ManyToOne
+    @JoinColumn(name = "thesis_id", nullable = false)
+    private ThesisTopic topic;
 
     @Column(name = "research_text", columnDefinition = "TEXT", nullable = false)
     private String researchText;

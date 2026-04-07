@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface ProofOfConceptRepository extends JpaRepository<ProofOfConcept, Long> {
     Optional<ProofOfConcept> findByStudent(AppUser student);
+    long count();
 }
