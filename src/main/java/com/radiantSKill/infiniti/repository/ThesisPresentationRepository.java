@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface ThesisPresentationRepository extends JpaRepository<ThesisPresentation, Long> {
     Optional<ThesisPresentation> findByStudent(AppUser student);
+    long count();
 }

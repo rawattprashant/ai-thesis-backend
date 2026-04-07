@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface SelfieVideoRepository extends JpaRepository<SelfieVideo, Long> {
     Optional<SelfieVideo> findByStudent(AppUser student);
+    long count();
 }

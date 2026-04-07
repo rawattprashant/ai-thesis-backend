@@ -1,5 +1,6 @@
 package com.radiantSKill.infiniti.services;
 
+import com.radiantSKill.infiniti.dto.ThesisRegistrationResponseDTO;
 import com.radiantSKill.infiniti.entity.*;
 import com.radiantSKill.infiniti.repository.*;
 
@@ -25,6 +26,8 @@ public class ThesisService {
     private final ThesisPresentationRepository thesisPresentationRepository;
     private final SelfieVideoRepository selfieVideoRepository;
     private final FileStorageService fileStorageService;
+
+    private final StudentSubmissionStoreRepository studentSubmissionStoreRepository;
 
     /* -------------------------------
        1️⃣ THESIS REGISTRATION
@@ -54,6 +57,18 @@ public class ThesisService {
         tr.setStatus("SUBMITTED");
 
         thesisRegistrationRepository.save(tr);
+
+        StudentSubmissionStore store = getStore(student);
+
+        store.setSchoolName(req.getSchoolName());
+        store.setGrade(req.getGrade());
+        store.setSection(req.getSection());
+        store.setThesisTopic(req.getThesisTopic());
+
+        store.setRegistrationStatus("COMPLETED");
+        store.setOverallStatus("IN_PROGRESS");
+
+        studentSubmissionStoreRepository.save(store);
     }
 
     /* -------------------------------
@@ -73,6 +88,14 @@ public class ThesisService {
         poc.setStatus("SUBMITTED");
 
         proofOfConceptRepository.save(poc);
+
+        StudentSubmissionStore store = getStore(student);
+
+        store.setPocStatus("COMPLETED");
+        store.setProofOfConcept(poc);
+        store.setOverallStatus("POC_COMPLETED");
+
+        studentSubmissionStoreRepository.save(store);
     }
 
     /* -------------------------------
@@ -101,6 +124,13 @@ public class ThesisService {
         dp.setStatus("SUBMITTED");
 
         digitalPrototypeRepository.save(dp);
+
+        StudentSubmissionStore store = getStore(student);
+
+        store.setDigitalPrototypeStatus("COMPLETED");
+        store.setDigitalPrototype(dp);
+
+        studentSubmissionStoreRepository.save(store);
     }
 
     /* -------------------------------
@@ -123,6 +153,14 @@ public class ThesisService {
         fm.setStatus("SUBMITTED");
 
         financialModelRepository.save(fm);
+
+        StudentSubmissionStore store = getStore(student);
+
+        store.setFinancialModelStatus("COMPLETED");
+        store.setFinancialModel(fm);
+        store.setOverallStatus("FINANCIAL_MODEL_COMPLETED");
+
+        studentSubmissionStoreRepository.save(store);
     }
 
     /* -------------------------------
@@ -144,6 +182,13 @@ public class ThesisService {
         tp.setStatus("SUBMITTED");
 
         thesisPresentationRepository.save(tp);
+
+        StudentSubmissionStore store = getStore(student);
+
+        store.setPresentationStatus("COMPLETED");
+        store.setThesisPresentation(tp);
+
+        studentSubmissionStoreRepository.save(store);
     }
 
     /* -------------------------------
@@ -165,6 +210,49 @@ public class ThesisService {
         sv.setStatus("SUBMITTED");
 
         selfieVideoRepository.save(sv);
+
+        StudentSubmissionStore store = getStore(student);
+
+        store.setSelfieVideoStatus("COMPLETED");
+        store.setSelfieVideo(sv);
+
+        store.setOverallStatus("COMPLETED");
+        store.setSubmissionStatus("SUBMITTED");
+
+        studentSubmissionStoreRepository.save(store);
+    }
+
+    public ThesisRegistrationResponseDTO getThesisRegistration(String email) {
+
+        AppUser student = getStudent(email);
+
+        ThesisRegistration tr = thesisRegistrationRepository
+                .findByStudent(student)
+                .orElseThrow(() -> new RuntimeException("Thesis not found"));
+
+        ThesisRegistrationResponseDTO dto = new ThesisRegistrationResponseDTO();
+
+        dto.setSchoolName(tr.getSchoolName());
+        dto.setGender(tr.getGender());
+        dto.setDateOfBirth(tr.getDateOfBirth());
+        dto.setGrade(tr.getGrade());
+        dto.setSection(tr.getSection());
+
+        dto.setStudentEmail(tr.getStudentEmail());
+        dto.setStudentMobile(tr.getStudentMobile());
+
+        dto.setParentEmail(tr.getParentEmail());
+        dto.setParentMobile(tr.getParentMobile());
+
+        dto.setThesisTopic(tr.getThesisTopic());
+        dto.setThesisIntent(tr.getThesisIntent());
+
+        dto.setHasDigitalPrototype(tr.getHasDigitalPrototype());
+        dto.setHasInvestorInterest(tr.getHasInvestorInterest());
+
+        dto.setStatus(tr.getStatus());
+
+        return dto;
     }
 
     /* -------------------------------
@@ -193,5 +281,10 @@ public class ThesisService {
     private void ensurePresentationCompleted(AppUser student) {
         thesisPresentationRepository.findByStudent(student)
                 .orElseThrow(() -> new RuntimeException("Presentation required"));
+    }
+
+    private StudentSubmissionStore getStore(AppUser student) {
+        return studentSubmissionStoreRepository.findByStudent(student)
+                .orElseThrow(() -> new RuntimeException("Submission store not found"));
     }
 }

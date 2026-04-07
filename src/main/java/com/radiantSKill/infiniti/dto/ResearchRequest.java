@@ -1,21 +1,23 @@
 package com.radiantSKill.infiniti.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
 public class ResearchRequest {
 
-    @NotNull
+    // ✅ For normal topics (A, B, C, D)
     private Long thesisId;
 
-    @NotBlank
+    // ✅ Will be "OTHER" when custom topic is selected
     private String topic;
 
+    // ✅ Custom topic name (E, F, etc.)
+    private String customTopic;
+
     @NotBlank
-    @Size(max = 8000) // approx 1000 words
+    @Size(max = 8000)
     private String researchText;
 
     @Size(max = 8000)

@@ -1,8 +1,6 @@
 package com.radiantSKill.infiniti.controllers;
 
-import com.radiantSKill.infiniti.dto.ProofOfConceptRequest;
-import com.radiantSKill.infiniti.dto.ResearchRequest;
-import com.radiantSKill.infiniti.dto.ThesisRegistrationRequest;
+import com.radiantSKill.infiniti.dto.*;
 import com.radiantSKill.infiniti.services.ThesisResearchService;
 import com.radiantSKill.infiniti.services.ThesisService;
 import lombok.RequiredArgsConstructor;
@@ -24,150 +22,147 @@ public class ThesisController {
 
     // 1️⃣ Thesis Registration
     @PostMapping("/registration")
-    public ResponseEntity<?> registerThesis(
+    public ResponseEntity<ApiResponse<?>> registerThesis(
             @RequestBody ThesisRegistrationRequest request,
             Authentication auth) {
 
         if (auth == null || !auth.isAuthenticated()) {
             return ResponseEntity.status(401)
-                    .body(Map.of(
-                            "status", "error",
-                            "message", "Unauthorized: Please login first"
-                    ));
+                    .body(new ApiResponse<>("error", "Unauthorized: Please login first", null));
         }
 
         thesisService.saveThesisRegistration(auth.getName(), request);
+
         return ResponseEntity.ok(
-                Map.of(
-                        "status", "success",
-                        "message", "Thesis registration saved"
+                new ApiResponse<>("success", "Thesis registration saved", null)
+        );
+    }
+
+    @GetMapping("/registration")
+    public ResponseEntity<ApiResponse<ThesisRegistrationResponseDTO>> getThesis(
+            Authentication auth) {
+
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(401)
+                    .body(new ApiResponse<>("error", "Unauthorized: Please login first", null));
+        }
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        "Thesis fetched successfully",
+                        thesisService.getThesisRegistration(auth.getName())
                 )
         );
     }
 
     //Thesis-Research
     @PostMapping("/research")
-    public ResponseEntity<?> saveResearch(
-            @RequestBody @Valid ResearchRequest request,
+    public ResponseEntity<ApiResponse<?>> saveResearch(
+            @RequestBody ResearchRequest request,
             Authentication auth) {
 
         if (auth == null || !auth.isAuthenticated()) {
             return ResponseEntity.status(401)
-                    .body(Map.of(
-                            "status", "error",
-                            "message", "Unauthorized: Please login first"
-                    ));
+                    .body(new ApiResponse<>("error", "Unauthorized", null));
         }
 
         thesisResearchService.saveOrUpdateResearch(auth.getName(), request);
 
         return ResponseEntity.ok(
-                Map.of(
-                        "status", "success",
-                        "message", "Research milestone saved"
-                )
+                new ApiResponse<>("success", "Research saved", null)
         );
     }
 
     // 2️⃣ Proof of Concept
     @PostMapping("/proof-of-concept")
-    public ResponseEntity<?> saveProofOfConcept(
+    public ResponseEntity<ApiResponse<?>> savePOC(
             @RequestBody ProofOfConceptRequest request,
             Authentication auth) {
+
         if (auth == null || !auth.isAuthenticated()) {
             return ResponseEntity.status(401)
-                    .body(Map.of(
-                            "status", "error",
-                            "message", "Unauthorized: Please login first"
-                    ));
+                    .body(new ApiResponse<>("error", "Unauthorized", null));
         }
+
         thesisService.saveProofOfConcept(auth.getName(), request);
+
         return ResponseEntity.ok(
-                Map.of(
-                        "status", "success",
-                        "message", "Proof of Concept saved"
-                ));
+                new ApiResponse<>("success", "Proof of Concept saved", null)
+        );
     }
 
     // 3️⃣ Digital Prototype (optional)
     @PostMapping("/digital-prototype")
-    public ResponseEntity<?> uploadDigitalPrototype(
-            @RequestParam("description") String description,
-            @RequestParam("file") MultipartFile file,
+    public ResponseEntity<ApiResponse<?>> uploadDP(
+            @RequestParam String description,
+            @RequestParam MultipartFile file,
             Authentication auth) {
+
         if (auth == null || !auth.isAuthenticated()) {
             return ResponseEntity.status(401)
-                    .body(Map.of(
-                            "status", "error",
-                            "message", "Unauthorized: Please login first"
-                    ));
+                    .body(new ApiResponse<>("error", "Unauthorized", null));
         }
+
         thesisService.uploadDigitalPrototype(auth.getName(), description, file);
+
         return ResponseEntity.ok(
-                Map.of(
-                        "status", "success",
-                        "message", "Digital prototype uploaded"
-                ));
+                new ApiResponse<>("success", "Digital prototype uploaded", null)
+        );
     }
 
     // 4️⃣ Financial Model (mandatory)
     @PostMapping("/financial-model")
-    public ResponseEntity<?> uploadFinancialModel(
-            @RequestParam("summary") String summary,
-            @RequestParam("file") MultipartFile file,
+    public ResponseEntity<ApiResponse<?>> uploadFM(
+            @RequestParam String summary,
+            @RequestParam MultipartFile file,
             Authentication auth) {
+
         if (auth == null || !auth.isAuthenticated()) {
             return ResponseEntity.status(401)
-                    .body(Map.of(
-                            "status", "error",
-                            "message", "Unauthorized: Please login first"
-                    ));
+                    .body(new ApiResponse<>("error", "Unauthorized", null));
         }
+
         thesisService.uploadFinancialModel(auth.getName(), summary, file);
+
         return ResponseEntity.ok(
-                Map.of(
-                        "status", "success",
-                        "message", "Financial model uploaded"
-                ));
+                new ApiResponse<>("success", "Financial model uploaded", null)
+        );
     }
 
     // 5️⃣ Thesis Presentation
     @PostMapping("/presentation")
-    public ResponseEntity<?> uploadPresentation(
-            @RequestParam("file") MultipartFile file,
+    public ResponseEntity<ApiResponse<?>> uploadPresentation(
+            @RequestParam MultipartFile file,
             Authentication auth) {
+
         if (auth == null || !auth.isAuthenticated()) {
             return ResponseEntity.status(401)
-                    .body(Map.of(
-                            "status", "error",
-                            "message", "Unauthorized: Please login first"
-                    ));
+                    .body(new ApiResponse<>("error", "Unauthorized", null));
         }
+
         thesisService.uploadPresentation(auth.getName(), file);
+
         return ResponseEntity.ok(
-                Map.of(
-                        "status", "success",
-                        "message", "Presentation uploaded"
-                ));
+                new ApiResponse<>("success", "Presentation uploaded", null)
+        );
     }
 
     // 6️⃣ Selfie Video
     @PostMapping("/selfie-video")
-    public ResponseEntity<?> uploadSelfieVideo(
-            @RequestParam("file") MultipartFile file,
+    public ResponseEntity<ApiResponse<?>> uploadSelfieVideo(
+            @RequestParam MultipartFile file,
             Authentication auth) {
+
         if (auth == null || !auth.isAuthenticated()) {
             return ResponseEntity.status(401)
-                    .body(Map.of(
-                            "status", "error",
-                            "message", "Unauthorized: Please login first"
-                    ));
+                    .body(new ApiResponse<>("error", "Unauthorized", null));
         }
+
         thesisService.uploadSelfieVideo(auth.getName(), file);
+
         return ResponseEntity.ok(
-                Map.of(
-                        "status", "success",
-                        "message", "Selfie video uploaded"
-                ));
+                new ApiResponse<>("success", "Selfie video uploaded", null)
+        );
     }
 }

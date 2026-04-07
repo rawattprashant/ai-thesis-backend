@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface FinancialModelRepository extends JpaRepository<FinancialModel, Long> {
     Optional<FinancialModel> findByStudent(AppUser student);
+    long count();
 }

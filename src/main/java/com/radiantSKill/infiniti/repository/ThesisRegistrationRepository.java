@@ -12,4 +12,5 @@ public interface ThesisRegistrationRepository
     Optional<ThesisRegistration> findByStudent(AppUser student);
 
     boolean existsByStudent(AppUser student);
+    long count();
 }
