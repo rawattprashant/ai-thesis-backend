@@ -8,8 +8,12 @@ import lombok.Data;
 @Data
 public class ThesisTopic {
 
+//    @Id
+//    private Long id; // IMPORTANT: no auto-gen since you inserted manually
+
     @Id
-    private Long id; // IMPORTANT: no auto-gen since you inserted manually
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(unique = true, nullable = false)
     private String name;

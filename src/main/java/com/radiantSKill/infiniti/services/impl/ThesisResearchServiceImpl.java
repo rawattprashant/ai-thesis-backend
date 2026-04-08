@@ -52,28 +52,24 @@ public class ThesisResearchServiceImpl implements ThesisResearchService {
 
     private ThesisTopic resolveTopic(ResearchRequest request) {
 
-        // Normal selection (A, B, C, D)
-        if (request.getThesisId() != null) {
-            return topicRepository.findById(request.getThesisId())
-                    .orElseThrow(() -> new RuntimeException("Invalid topic ID"));
+        // Case 1: Topic selected from dropdown
+        if (request.getTopic() != null && !"OTHER".equalsIgnoreCase(request.getTopic())) {
+            return topicRepository.findByNameIgnoreCase(request.getTopic())
+                    .orElseThrow(() -> new RuntimeException("Invalid topic"));
         }
 
-        // OTHER case
+        // Case 2: Custom topic (OTHER)
         if ("OTHER".equalsIgnoreCase(request.getTopic())) {
 
             return topicRepository.findByNameIgnoreCase(request.getCustomTopic())
                     .orElseGet(() -> {
-                        Long nextId = topicRepository.getMaxId() + 1;
-
                         ThesisTopic newTopic = new ThesisTopic();
-                        newTopic.setId(nextId);
-                        newTopic.setName(sanitize(request.getCustomTopic()));
-
+                        newTopic.setName(request.getCustomTopic());
                         return topicRepository.save(newTopic);
                     });
         }
 
-        throw new RuntimeException("Invalid topic selection");
+        throw new RuntimeException("Topic is required");
     }
 
     private String sanitize(String input) {

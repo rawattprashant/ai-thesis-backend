@@ -39,9 +39,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         try {
             String username = jwtUtil.extractUsername(token);
-//            System.out.println("TOKEN = " + token);
-//            System.out.println("USERNAME = " + username);
-//            System.out.println("TOKEN VALID = " + jwtUtil.isTokenValid(token));
+            String role = jwtUtil.extractRole(token); // ✅ extract role from JWT
 
             if (username != null &&
                     SecurityContextHolder.getContext().getAuthentication() == null &&
@@ -52,16 +50,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                 username,
                                 null,
                                 Collections.singletonList(
-                                        new SimpleGrantedAuthority("ROLE_STUDENT")
+                                        new SimpleGrantedAuthority("ROLE_" + role) // ✅ dynamic role
                                 )
                         );
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-//                System.out.println("AUTHENTICATION SET");
             }
 
         } catch (Exception e) {
-            // Invalid token → let Spring return 403
+            // Invalid token → let Spring handle (403)
         }
 
         filterChain.doFilter(request, response);
