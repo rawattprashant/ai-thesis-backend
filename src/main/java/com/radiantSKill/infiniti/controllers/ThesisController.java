@@ -39,6 +39,98 @@ public class ThesisController {
         );
     }
 
+    // get api for selfie video
+
+    @GetMapping("selfie-video")
+    public ResponseEntity<ApiResponse<ThesisSelfVideoDTO>> getSelfieVideo(
+            Authentication auth){
+        if(auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(401)
+                    .body(new ApiResponse<>("error", "Unauthorized: Please login first", null));
+        }
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        "Selfie video fetched successfully",
+                        thesisService.getSelfieVideo(auth.getName())
+                )
+        );
+
+    }
+
+    // get api for proof of concept
+
+    @GetMapping("proof-of-concept")
+    public ResponseEntity<ApiResponse<ThesisProofOFConceptDTO>>getProofOfConcept(
+            Authentication auth){
+        if(auth == null || !auth.isAuthenticated()){
+            return ResponseEntity.status(401)
+                    .body(new ApiResponse<>("error","Unauthorized: Please login first",null));
+        }
+        return  ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        "Proof of concept fetched successfully",
+                        thesisService.getProofOfConcept(auth.getName())
+                )
+        );
+    }
+
+    // get api for presentation
+    @GetMapping("presentation")
+    public ResponseEntity<ApiResponse<ThesisResentationDTO>>getPresentation(
+            Authentication auth){
+        if(auth == null || !auth.isAuthenticated()){
+            return ResponseEntity.status(401)
+                    .body(new ApiResponse<>("error","Unauthorized: Please login first",null));
+        }
+        return  ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        "Proof of concept fetched successfully",
+                        thesisService.getRepresentation(auth.getName())
+                )
+        );
+
+    }
+
+    //get api for financial model
+    @GetMapping("financial-model")
+    public ResponseEntity<ApiResponse<ThesisFinancialModelDTO>>getFinancialModel(
+            Authentication auth){
+        if(auth == null || !auth.isAuthenticated()){
+            return ResponseEntity.status(401)
+                    .body(new ApiResponse<>("error","Unauthorized: Please login first",null));
+        }
+        return  ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        "Proof of concept fetched successfully",
+                        thesisService.getFinancialModel(auth.getName())
+                )
+        );
+    }
+
+    //get api for digital prototype
+
+    @GetMapping("digital-prototype")
+    public  ResponseEntity<ApiResponse<ThesisDigitalPrototypeDTO>>getDigitalPrototype(
+            Authentication auth){
+        if(auth == null || !auth.isAuthenticated()){
+            return ResponseEntity.status(401)
+                    .body(new ApiResponse<>("error","Unauthorized: Please login first",null));
+        }
+        return  ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        "Proof of concept fetched successfully",
+                        thesisService.getDigitalPrototype(auth.getName())
+                )
+        );
+
+    }
+
+
     @GetMapping("/registration")
     public ResponseEntity<ApiResponse<ThesisRegistrationResponseDTO>> getThesis(
             Authentication auth) {
