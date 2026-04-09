@@ -31,6 +31,7 @@ public class StudentSubmissionStore {
 
     // ✅ Stage-wise status tracking
     private String registrationStatus;
+    private String researchStatus;
     private String pocStatus;
     private String digitalPrototypeStatus;
     private String financialModelStatus;
@@ -65,6 +66,10 @@ public class StudentSubmissionStore {
     @ManyToOne
     @JoinColumn(name = "financial_model_id")
     private FinancialModel financialModel;
+
+    @ManyToOne
+    @JoinColumn(name = "research_id")
+    private ThesisResearch thesisResearch;
 
     // ✅ Audit fields
     @CreationTimestamp

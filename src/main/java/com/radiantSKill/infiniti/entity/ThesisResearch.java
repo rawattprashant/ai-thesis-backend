@@ -31,6 +31,9 @@ public class ThesisResearch {
     @Column(name = "research_text", columnDefinition = "TEXT", nullable = false)
     private String researchText;
 
+    @Column(name = "status")
+    private String status;
+
     @Column(name = "thoughts_text", columnDefinition = "TEXT")
     private String thoughtsText;
 

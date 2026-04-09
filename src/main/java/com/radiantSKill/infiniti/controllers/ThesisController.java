@@ -167,6 +167,20 @@ public class ThesisController {
         );
     }
 
+    @GetMapping("/research")
+    public ResponseEntity<ApiResponse<?>> getResearch(Authentication auth) {
+
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(401)
+                    .body(new ApiResponse<>("error", "Unauthorized", null));
+        }
+
+        return ResponseEntity.ok(
+                new ApiResponse<>("success", "Research fetched",
+                        thesisResearchService.getResearch(auth.getName()))
+        );
+    }
+
     // 2️⃣ Proof of Concept
     @PostMapping("/proof-of-concept")
     public ResponseEntity<ApiResponse<?>> savePOC(
