@@ -25,6 +25,8 @@ public interface StudentSubmissionStoreRepository extends JpaRepository<StudentS
 
     List<StudentSubmissionStore> findByRegistrationStatus(String status);
 
+    List<StudentSubmissionStore> findByResearchStatus(String status);
+
     List<StudentSubmissionStore> findByPocStatus(String status);
 
     List<StudentSubmissionStore> findByFinancialModelStatus(String status);

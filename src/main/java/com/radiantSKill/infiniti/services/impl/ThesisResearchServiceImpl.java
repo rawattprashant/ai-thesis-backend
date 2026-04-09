@@ -1,6 +1,7 @@
 package com.radiantSKill.infiniti.services.impl;
 
 import com.radiantSKill.infiniti.dto.ResearchRequest;
+import com.radiantSKill.infiniti.dto.ResearchResponse;
 import com.radiantSKill.infiniti.entity.AppUser;
 import com.radiantSKill.infiniti.entity.StudentSubmissionStore;
 import com.radiantSKill.infiniti.entity.ThesisResearch;
@@ -41,10 +42,13 @@ public class ThesisResearchServiceImpl implements ThesisResearchService {
         research.setResearchText(sanitize(request.getResearchText()));
         research.setThoughtsText(sanitize(request.getThoughtsText()));
         research.setSubmittedAt(LocalDateTime.now());
+        research.setStatus("SUBMITTED");
 
         repository.save(research);
 
         StudentSubmissionStore store = getStore(student);
+        store.setResearchStatus("COMPLETED");
+        store.setThesisResearch(research);
         store.setOverallStatus("RESEARCH_COMPLETED");
 
         studentSubmissionStoreRepository.save(store);
@@ -80,5 +84,22 @@ public class ThesisResearchServiceImpl implements ThesisResearchService {
     private StudentSubmissionStore getStore(AppUser student) {
         return studentSubmissionStoreRepository.findByStudent(student)
                 .orElseThrow(() -> new RuntimeException("Submission store not found"));
+    }
+
+    public ResearchResponse getResearch(String email) {
+
+        AppUser student = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        ThesisResearch research = repository.findByStudent(student)
+                .orElseThrow(() -> new RuntimeException("Research not found"));
+
+        return ResearchResponse.builder()
+                .topic(research.getTopic().getName())
+                .researchText(research.getResearchText())
+                .thoughtsText(research.getThoughtsText())
+                .status(research.getStatus())
+                .submittedAt(research.getSubmittedAt())
+                .build();
     }
 }
