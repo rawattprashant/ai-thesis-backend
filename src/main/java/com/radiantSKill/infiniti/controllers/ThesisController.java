@@ -4,12 +4,13 @@ import com.radiantSKill.infiniti.dto.*;
 import com.radiantSKill.infiniti.services.ThesisResearchService;
 import com.radiantSKill.infiniti.services.ThesisService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Valid;
+//import javax.validation.Valid;
 import java.util.Map;
 
 @RestController
@@ -185,10 +186,10 @@ public class ThesisController {
     }
 
     // 3️⃣ Digital Prototype (optional)
-    @PostMapping("/digital-prototype")
+    @PostMapping(value = "/digital-prototype", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<?>> uploadDP(
             @RequestParam String description,
-            @RequestParam MultipartFile file,
+            @RequestPart("file") MultipartFile file,
             Authentication auth) {
 
         if (auth == null || !auth.isAuthenticated()) {
@@ -204,10 +205,10 @@ public class ThesisController {
     }
 
     // 4️⃣ Financial Model (mandatory)
-    @PostMapping("/financial-model")
+    @PostMapping(value = "/financial-model", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<?>> uploadFM(
             @RequestParam String summary,
-            @RequestParam MultipartFile file,
+            @RequestPart("file") MultipartFile file,
             Authentication auth) {
 
         if (auth == null || !auth.isAuthenticated()) {
@@ -223,9 +224,9 @@ public class ThesisController {
     }
 
     // 5️⃣ Thesis Presentation
-    @PostMapping("/presentation")
+    @PostMapping(value = "/presentation", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<?>> uploadPresentation(
-            @RequestParam MultipartFile file,
+            @RequestPart("file") MultipartFile file,
             Authentication auth) {
 
         if (auth == null || !auth.isAuthenticated()) {
@@ -241,9 +242,9 @@ public class ThesisController {
     }
 
     // 6️⃣ Selfie Video
-    @PostMapping("/selfie-video")
+    @PostMapping(value = "/selfie-video", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<?>> uploadSelfieVideo(
-            @RequestParam MultipartFile file,
+            @RequestPart("file") MultipartFile file,
             Authentication auth) {
 
         if (auth == null || !auth.isAuthenticated()) {

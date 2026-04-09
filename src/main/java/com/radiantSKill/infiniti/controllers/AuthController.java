@@ -4,6 +4,8 @@ import com.radiantSKill.infiniti.dto.ApiResponse;
 import com.radiantSKill.infiniti.dto.LoginRequest;
 import com.radiantSKill.infiniti.dto.RegisterRequestDTO;
 import com.radiantSKill.infiniti.dto.UserResponseDTO;
+import com.radiantSKill.infiniti.entity.AppUser;
+import com.radiantSKill.infiniti.repository.AppUserRepository;
 import com.radiantSKill.infiniti.services.UserService;
 import com.radiantSKill.infiniti.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class AuthController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final AppUserRepository appUserRepository;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<?>> register(@RequestBody RegisterRequestDTO request) {
@@ -45,7 +48,18 @@ public class AuthController {
                 )
         );
 
-        String token = jwtUtil.generateToken(loginRequest.getEmail());
+        // ✅ fetch user to get role
+        AppUser user = appUserRepository.findByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String role = user.getRoles()
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Role not found"))
+                .getName();
+
+        // ✅ generate token with role
+        String token = jwtUtil.generateToken(user.getEmail(), role);
 
         return ResponseEntity.ok(
                 new ApiResponse<>(
