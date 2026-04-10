@@ -1,6 +1,7 @@
 package com.radiantSKill.infiniti.services.impl;
 
 import com.radiantSKill.infiniti.dto.ResearchRequest;
+import com.radiantSKill.infiniti.dto.ResearchResponse;
 import com.radiantSKill.infiniti.entity.AppUser;
 import com.radiantSKill.infiniti.entity.StudentSubmissionStore;
 import com.radiantSKill.infiniti.entity.ThesisResearch;
@@ -41,10 +42,13 @@ public class ThesisResearchServiceImpl implements ThesisResearchService {
         research.setResearchText(sanitize(request.getResearchText()));
         research.setThoughtsText(sanitize(request.getThoughtsText()));
         research.setSubmittedAt(LocalDateTime.now());
+        research.setStatus("SUBMITTED");
 
         repository.save(research);
 
         StudentSubmissionStore store = getStore(student);
+        store.setResearchStatus("COMPLETED");
+        store.setThesisResearch(research);
         store.setOverallStatus("RESEARCH_COMPLETED");
 
         studentSubmissionStoreRepository.save(store);
@@ -52,28 +56,24 @@ public class ThesisResearchServiceImpl implements ThesisResearchService {
 
     private ThesisTopic resolveTopic(ResearchRequest request) {
 
-        // Normal selection (A, B, C, D)
-        if (request.getThesisId() != null) {
-            return topicRepository.findById(request.getThesisId())
-                    .orElseThrow(() -> new RuntimeException("Invalid topic ID"));
+        // Case 1: Topic selected from dropdown
+        if (request.getTopic() != null && !"OTHER".equalsIgnoreCase(request.getTopic())) {
+            return topicRepository.findByNameIgnoreCase(request.getTopic())
+                    .orElseThrow(() -> new RuntimeException("Invalid topic"));
         }
 
-        // OTHER case
+        // Case 2: Custom topic (OTHER)
         if ("OTHER".equalsIgnoreCase(request.getTopic())) {
 
             return topicRepository.findByNameIgnoreCase(request.getCustomTopic())
                     .orElseGet(() -> {
-                        Long nextId = topicRepository.getMaxId() + 1;
-
                         ThesisTopic newTopic = new ThesisTopic();
-                        newTopic.setId(nextId);
-                        newTopic.setName(sanitize(request.getCustomTopic()));
-
+                        newTopic.setName(request.getCustomTopic());
                         return topicRepository.save(newTopic);
                     });
         }
 
-        throw new RuntimeException("Invalid topic selection");
+        throw new RuntimeException("Topic is required");
     }
 
     private String sanitize(String input) {
@@ -84,5 +84,22 @@ public class ThesisResearchServiceImpl implements ThesisResearchService {
     private StudentSubmissionStore getStore(AppUser student) {
         return studentSubmissionStoreRepository.findByStudent(student)
                 .orElseThrow(() -> new RuntimeException("Submission store not found"));
+    }
+
+    public ResearchResponse getResearch(String email) {
+
+        AppUser student = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        ThesisResearch research = repository.findByStudent(student)
+                .orElseThrow(() -> new RuntimeException("Research not found"));
+
+        return ResearchResponse.builder()
+                .topic(research.getTopic().getName())
+                .researchText(research.getResearchText())
+                .thoughtsText(research.getThoughtsText())
+                .status(research.getStatus())
+                .submittedAt(research.getSubmittedAt())
+                .build();
     }
 }

@@ -4,12 +4,13 @@ import com.radiantSKill.infiniti.dto.*;
 import com.radiantSKill.infiniti.services.ThesisResearchService;
 import com.radiantSKill.infiniti.services.ThesisService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Valid;
+//import javax.validation.Valid;
 import java.util.Map;
 
 @RestController
@@ -37,6 +38,98 @@ public class ThesisController {
                 new ApiResponse<>("success", "Thesis registration saved", null)
         );
     }
+
+    // get api for selfie video
+
+    @GetMapping("selfie-video")
+    public ResponseEntity<ApiResponse<ThesisSelfVideoDTO>> getSelfieVideo(
+            Authentication auth){
+        if(auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(401)
+                    .body(new ApiResponse<>("error", "Unauthorized: Please login first", null));
+        }
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        "Selfie video fetched successfully",
+                        thesisService.getSelfieVideo(auth.getName())
+                )
+        );
+
+    }
+
+    // get api for proof of concept
+
+    @GetMapping("proof-of-concept")
+    public ResponseEntity<ApiResponse<ThesisProofOFConceptDTO>>getProofOfConcept(
+            Authentication auth){
+        if(auth == null || !auth.isAuthenticated()){
+            return ResponseEntity.status(401)
+                    .body(new ApiResponse<>("error","Unauthorized: Please login first",null));
+        }
+        return  ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        "Proof of concept fetched successfully",
+                        thesisService.getProofOfConcept(auth.getName())
+                )
+        );
+    }
+
+    // get api for presentation
+    @GetMapping("presentation")
+    public ResponseEntity<ApiResponse<ThesisResentationDTO>>getPresentation(
+            Authentication auth){
+        if(auth == null || !auth.isAuthenticated()){
+            return ResponseEntity.status(401)
+                    .body(new ApiResponse<>("error","Unauthorized: Please login first",null));
+        }
+        return  ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        "Proof of concept fetched successfully",
+                        thesisService.getRepresentation(auth.getName())
+                )
+        );
+
+    }
+
+    //get api for financial model
+    @GetMapping("financial-model")
+    public ResponseEntity<ApiResponse<ThesisFinancialModelDTO>>getFinancialModel(
+            Authentication auth){
+        if(auth == null || !auth.isAuthenticated()){
+            return ResponseEntity.status(401)
+                    .body(new ApiResponse<>("error","Unauthorized: Please login first",null));
+        }
+        return  ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        "Proof of concept fetched successfully",
+                        thesisService.getFinancialModel(auth.getName())
+                )
+        );
+    }
+
+    //get api for digital prototype
+
+    @GetMapping("digital-prototype")
+    public  ResponseEntity<ApiResponse<ThesisDigitalPrototypeDTO>>getDigitalPrototype(
+            Authentication auth){
+        if(auth == null || !auth.isAuthenticated()){
+            return ResponseEntity.status(401)
+                    .body(new ApiResponse<>("error","Unauthorized: Please login first",null));
+        }
+        return  ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        "Proof of concept fetched successfully",
+                        thesisService.getDigitalPrototype(auth.getName())
+                )
+        );
+
+    }
+
 
     @GetMapping("/registration")
     public ResponseEntity<ApiResponse<ThesisRegistrationResponseDTO>> getThesis(
@@ -74,6 +167,20 @@ public class ThesisController {
         );
     }
 
+    @GetMapping("/research")
+    public ResponseEntity<ApiResponse<?>> getResearch(Authentication auth) {
+
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(401)
+                    .body(new ApiResponse<>("error", "Unauthorized", null));
+        }
+
+        return ResponseEntity.ok(
+                new ApiResponse<>("success", "Research fetched",
+                        thesisResearchService.getResearch(auth.getName()))
+        );
+    }
+
     // 2️⃣ Proof of Concept
     @PostMapping("/proof-of-concept")
     public ResponseEntity<ApiResponse<?>> savePOC(
@@ -93,10 +200,10 @@ public class ThesisController {
     }
 
     // 3️⃣ Digital Prototype (optional)
-    @PostMapping("/digital-prototype")
+    @PostMapping(value = "/digital-prototype", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<?>> uploadDP(
             @RequestParam String description,
-            @RequestParam MultipartFile file,
+            @RequestPart("file") MultipartFile file,
             Authentication auth) {
 
         if (auth == null || !auth.isAuthenticated()) {
@@ -112,10 +219,10 @@ public class ThesisController {
     }
 
     // 4️⃣ Financial Model (mandatory)
-    @PostMapping("/financial-model")
+    @PostMapping(value = "/financial-model", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<?>> uploadFM(
             @RequestParam String summary,
-            @RequestParam MultipartFile file,
+            @RequestPart("file") MultipartFile file,
             Authentication auth) {
 
         if (auth == null || !auth.isAuthenticated()) {
@@ -131,9 +238,9 @@ public class ThesisController {
     }
 
     // 5️⃣ Thesis Presentation
-    @PostMapping("/presentation")
+    @PostMapping(value = "/presentation", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<?>> uploadPresentation(
-            @RequestParam MultipartFile file,
+            @RequestPart("file") MultipartFile file,
             Authentication auth) {
 
         if (auth == null || !auth.isAuthenticated()) {
@@ -149,9 +256,9 @@ public class ThesisController {
     }
 
     // 6️⃣ Selfie Video
-    @PostMapping("/selfie-video")
+    @PostMapping(value = "/selfie-video", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<?>> uploadSelfieVideo(
-            @RequestParam MultipartFile file,
+            @RequestPart("file") MultipartFile file,
             Authentication auth) {
 
         if (auth == null || !auth.isAuthenticated()) {

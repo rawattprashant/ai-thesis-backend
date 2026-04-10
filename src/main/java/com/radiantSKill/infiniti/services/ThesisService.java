@@ -1,11 +1,8 @@
 package com.radiantSKill.infiniti.services;
 
-import com.radiantSKill.infiniti.dto.ThesisRegistrationResponseDTO;
+import com.radiantSKill.infiniti.dto.*;
 import com.radiantSKill.infiniti.entity.*;
 import com.radiantSKill.infiniti.repository.*;
-
-import com.radiantSKill.infiniti.dto.ThesisRegistrationRequest;
-import com.radiantSKill.infiniti.dto.ProofOfConceptRequest;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -221,6 +218,99 @@ public class ThesisService {
 
         studentSubmissionStoreRepository.save(store);
     }
+    // get api selfie video
+
+    public ThesisSelfVideoDTO getSelfieVideo(String email){
+        AppUser student = getStudent(email);
+
+        SelfieVideo tr = selfieVideoRepository
+                .findByStudent(student)
+                .orElseThrow(() -> new RuntimeException("Selfie video not found"));
+        ThesisSelfVideoDTO dto = new ThesisSelfVideoDTO();
+
+        dto.setStatus(tr.getStatus());
+        dto.setFile_url(tr.getFileUrl());
+        dto.setUploaded_at(tr.getUploadedAt());
+
+        return  dto;
+
+    }
+
+    // get api proof of concept
+    public ThesisProofOFConceptDTO getProofOfConcept(String email){
+        AppUser student = getStudent(email);
+
+        ProofOfConcept tr = proofOfConceptRepository
+                .findByStudent(student)
+                .orElseThrow(()  -> new RuntimeException("Proof of concept not found"));
+        ThesisProofOFConceptDTO dto = new ThesisProofOFConceptDTO();
+
+        dto.setStatus(tr.getStatus());
+        dto.setContent(tr.getContent());
+        dto.setUpdated_at(tr.getUpdatedAt());
+
+        return  dto;
+
+
+    }
+
+    // get api thesis representation
+
+    public ThesisResentationDTO getRepresentation(String email){
+        AppUser student = getStudent(email);
+
+        ThesisPresentation tr = thesisPresentationRepository
+                .findByStudent(student)
+                .orElseThrow(()->new RuntimeException("Presentation  not found") );
+
+        ThesisResentationDTO dto = new ThesisResentationDTO();
+
+        dto.setStatus(tr.getStatus());
+        dto.setFile_url(tr.getFileUrl());
+        dto.setUploaded_at(tr.getUploadedAt());
+
+
+        return dto;
+    }
+// get api for financial model
+    public ThesisFinancialModelDTO getFinancialModel(String email){
+        AppUser student = getStudent(email);
+
+        FinancialModel tr = financialModelRepository
+                .findByStudent(student)
+                .orElseThrow(()->new RuntimeException("Financial model  not found"));
+
+        ThesisFinancialModelDTO dto = new ThesisFinancialModelDTO();
+
+        dto.setStatus(tr.getStatus());
+        dto.setFileUrl(tr.getFileUrl());
+        dto.setLearningSummary(tr.getLearningSummary());
+        dto.setUploadedAt(tr.getUploadedAt());
+
+
+        return dto;
+    }
+
+    //get api for digital prototype
+
+    public ThesisDigitalPrototypeDTO getDigitalPrototype(String email){
+        AppUser student = getStudent(email);
+
+        DigitalPrototype tr = digitalPrototypeRepository
+                .findByStudent(student)
+                .orElseThrow(()->new RuntimeException("Digital prototype  not found"));
+
+        ThesisDigitalPrototypeDTO dto = new ThesisDigitalPrototypeDTO();
+
+        dto.setDescription(tr.getDescription());
+        dto.setStatus(tr.getStatus());
+        dto.setFileUrl(tr.getFileUrl());
+        dto.setUploadedAt(tr.getUploadedAt());
+
+        return  dto;
+    }
+
+
 
     public ThesisRegistrationResponseDTO getThesisRegistration(String email) {
 
