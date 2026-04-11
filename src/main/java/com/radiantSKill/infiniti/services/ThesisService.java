@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -24,6 +26,7 @@ public class ThesisService {
     private final SelfieVideoRepository selfieVideoRepository;
     private final FileStorageService fileStorageService;
 
+    private final ThesisTopicRepository thesisTopicRepository;
     private final StudentSubmissionStoreRepository studentSubmissionStoreRepository;
 
     /* -------------------------------
@@ -343,6 +346,16 @@ public class ThesisService {
         dto.setStatus(tr.getStatus());
 
         return dto;
+    }
+
+    public List<ThesisTopicDTO> getAllTopics() {
+        return thesisTopicRepository.fetchAllTopics()
+                .stream()
+                .map(obj -> new ThesisTopicDTO(
+                        (Long) obj[0],
+                        (String) obj[1]
+                ))
+                .toList();
     }
 
     /* -------------------------------
