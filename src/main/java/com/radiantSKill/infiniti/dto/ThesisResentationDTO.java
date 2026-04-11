@@ -8,5 +8,6 @@ import java.time.LocalDateTime;
 public class ThesisResentationDTO {
     private String file_url;
     private String status;
+    private String description;
     private LocalDateTime uploaded_at;
 }
