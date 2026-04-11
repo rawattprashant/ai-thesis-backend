@@ -19,7 +19,7 @@ public class Role {
     private String name;
 
     @Column(name="role_description")
-    private String role_description;
+    private String roleDescription;
 
 }
 

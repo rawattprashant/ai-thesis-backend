@@ -1,5 +1,6 @@
 package com.radiantSKill.infiniti.services;
 
+import com.radiantSKill.infiniti.dao.UserDAO;
 import com.radiantSKill.infiniti.dto.RegisterRequestDTO;
 import com.radiantSKill.infiniti.dto.UserResponseDTO;
 import com.radiantSKill.infiniti.entity.AppUser;
@@ -23,6 +24,8 @@ public class UserService {
     private final AppUserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+
+    private final UserDAO userDAO;
 
     @Transactional
     public void registerUser(RegisterRequestDTO request) {
@@ -54,6 +57,7 @@ public class UserService {
 
         AppUser user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        String role = userDAO.findRoleByUserId(user.getId());
 
         UserResponseDTO dto = new UserResponseDTO();
         dto.setFirstName(user.getFirstName());
@@ -61,6 +65,7 @@ public class UserService {
         dto.setEmail(user.getEmail());
         dto.setPhone(user.getPhone());
         dto.setStatus(user.getStatus());
+        dto.setRole(role);
 
         return dto;
     }
