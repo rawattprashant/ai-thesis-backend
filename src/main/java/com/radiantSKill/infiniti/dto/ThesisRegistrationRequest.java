@@ -16,6 +16,7 @@ public class ThesisRegistrationRequest {
     private String studentMobile;
     private String parentEmail;
     private String parentMobile;
+    private Long thesisId;
     private String thesisTopic;
     private String thesisIntent;
     private Boolean hasDigitalPrototype;

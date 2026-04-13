@@ -7,14 +7,7 @@ import lombok.Data;
 @Data
 public class ResearchRequest {
 
-    // ✅ For normal topics (A, B, C, D)
-    private Long thesisId;
-
-    // ✅ Will be "OTHER" when custom topic is selected
-    private String topic;
-
-    // ✅ Custom topic name (E, F, etc.)
-    private String customTopic;
+    private String topic; // <-- IMPORTANT (match UI)
 
     @NotBlank
     @Size(max = 8000)

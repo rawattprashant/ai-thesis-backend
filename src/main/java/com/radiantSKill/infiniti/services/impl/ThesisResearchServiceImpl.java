@@ -56,24 +56,18 @@ public class ThesisResearchServiceImpl implements ThesisResearchService {
 
     private ThesisTopic resolveTopic(ResearchRequest request) {
 
-        // Case 1: Topic selected from dropdown
-        if (request.getTopic() != null && !"OTHER".equalsIgnoreCase(request.getTopic())) {
-            return topicRepository.findByNameIgnoreCase(request.getTopic())
-                    .orElseThrow(() -> new RuntimeException("Invalid topic"));
+        String topicName = request.getTopic();
+
+        if (topicName == null || topicName.isBlank()) {
+            throw new RuntimeException("Topic is required");
         }
 
-        // Case 2: Custom topic (OTHER)
-        if ("OTHER".equalsIgnoreCase(request.getTopic())) {
-
-            return topicRepository.findByNameIgnoreCase(request.getCustomTopic())
-                    .orElseGet(() -> {
-                        ThesisTopic newTopic = new ThesisTopic();
-                        newTopic.setName(request.getCustomTopic());
-                        return topicRepository.save(newTopic);
-                    });
-        }
-
-        throw new RuntimeException("Topic is required");
+        return topicRepository.findByNameIgnoreCase(topicName.trim())
+                .orElseGet(() -> {
+                    ThesisTopic newTopic = new ThesisTopic();
+                    newTopic.setName(topicName.trim());
+                    return topicRepository.save(newTopic);
+                });
     }
 
     private String sanitize(String input) {
@@ -86,6 +80,7 @@ public class ThesisResearchServiceImpl implements ThesisResearchService {
                 .orElseThrow(() -> new RuntimeException("Submission store not found"));
     }
 
+    @Override
     public ResearchResponse getResearch(String email) {
 
         AppUser student = userRepository.findByEmail(email)
@@ -95,7 +90,11 @@ public class ThesisResearchServiceImpl implements ThesisResearchService {
                 .orElseThrow(() -> new RuntimeException("Research not found"));
 
         return ResearchResponse.builder()
-                .topic(research.getTopic().getName())
+                .topic(
+                        research.getTopic() != null
+                                ? research.getTopic().getName()
+                                : null
+                )
                 .researchText(research.getResearchText())
                 .thoughtsText(research.getThoughtsText())
                 .status(research.getStatus())
