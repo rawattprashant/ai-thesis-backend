@@ -1,10 +1,16 @@
 package com.radiantSKill.infiniti.dao.impl;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.radiantSKill.infiniti.dao.AdminDashboardDAO;
-import com.radiantSKill.infiniti.dto.*;
+import com.radiantSKill.infiniti.dto.DashboardFilterRequest;
+import com.radiantSKill.infiniti.dto.StudentDashboardDTO;
+import com.radiantSKill.infiniti.entity.QAppUser;
+import com.radiantSKill.infiniti.entity.QThesisRegistration;
+import com.radiantSKill.infiniti.util.Constants;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -17,6 +23,9 @@ public class AdminDashboardDAOImpl implements AdminDashboardDAO {
     @PersistenceContext
     private EntityManager entityManager;
 
+    QAppUser qAppUser = QAppUser.appUser;
+    QThesisRegistration qThesisRegistration = QThesisRegistration.thesisRegistration;
+
     @Override
     public List<StudentDashboardDTO> getStudents(
             DashboardFilterRequest filter,
@@ -24,60 +33,59 @@ public class AdminDashboardDAOImpl implements AdminDashboardDAO {
             int size
     ) {
 
-        String sql = """
-            SELECT
-            u.id,
-            CONCAT(u.first_name,' ',u.last_name),
-            tr.school_name,
-            tr.grade,
-            tr.has_digital_prototype,
-            tr.has_investor_interest
-            FROM app_user u
-            JOIN thesis_registration tr
-            ON u.id = tr.student_id
-            WHERE 1=1
-        """;
 
-        if(filter.getGrade()!=null)
-            sql += " AND tr.grade = :grade";
+        JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 
-        if(filter.getSection()!=null)
-            sql += " AND tr.section = :section";
+        BooleanBuilder builder = new BooleanBuilder();
 
-        if(filter.getDigitalPrototype()!=null)
-            sql += " AND tr.has_digital_prototype = :prototype";
+        // ✅ Gender
+        if (filter.getGender() != null && !filter.getGender().isBlank()) {
+            builder.and(qThesisRegistration.gender.equalsIgnoreCase(filter.getGender()));
+        }
 
-        if(filter.getInvestment()!=null)
-            sql += " AND tr.has_investor_interest = :investment";
+        // ✅ Grade
+        if (filter.getGrade() != null && !filter.getGrade().isBlank()) {
+            builder.and(qThesisRegistration.grade.eq(filter.getGrade()));
+        }
 
-        Query query = entityManager.createNativeQuery(sql);
+        // ✅ Section
+        if (filter.getSection() != null && !filter.getSection().isBlank()) {
+            builder.and(qThesisRegistration.section.eq(filter.getSection()));
+        }
 
-        if(filter.getGrade()!=null)
-            query.setParameter("grade",filter.getGrade());
+        // ✅ Digital Prototype
+        if (filter.getDigitalPrototype() != null && !filter.getDigitalPrototype().isBlank()) {
+            if (filter.getDigitalPrototype().equalsIgnoreCase(Constants.WITH_PROTOTYPE)) {
+                builder.and(qThesisRegistration.hasDigitalPrototype.isTrue());
+            } else if (filter.getDigitalPrototype().equalsIgnoreCase(Constants.WITHOUT_PROTOTYPE)) {
+                builder.and(qThesisRegistration.hasDigitalPrototype.isFalse());
+            }
+        }
 
-        if(filter.getSection()!=null)
-            query.setParameter("section",filter.getSection());
+        // ✅ Investment
+        if (filter.getInvestment() != null && !filter.getInvestment().isBlank()) {
+            if (filter.getInvestment().equalsIgnoreCase(Constants.INVESTIBLE)) {
+                builder.and(qThesisRegistration.hasInvestorInterest.isTrue());
+            } else if (filter.getInvestment().equalsIgnoreCase(Constants.NON_INVESTIBLE)) {
+                builder.and(qThesisRegistration.hasInvestorInterest.isFalse());
+            }
+        }
 
-        if(filter.getDigitalPrototype()!=null)
-            query.setParameter("prototype",filter.getDigitalPrototype());
-
-        if(filter.getInvestment()!=null)
-            query.setParameter("investment",filter.getInvestment());
-
-        query.setFirstResult(page*size);
-        query.setMaxResults(size);
-
-        List<Object[]> rows = query.getResultList();
-
-        return rows.stream().map(r ->
-                new StudentDashboardDTO(
-                        ((Number) r[0]).longValue(),
-                        (String) r[1],
-                        (String) r[2],
-                        (String) r[3],
-                        (Boolean) r[4],
-                        (Boolean) r[5]
-                )
-        ).toList();
+        return queryFactory
+                .select(Projections.constructor(
+                        StudentDashboardDTO.class,
+                        qAppUser.id,
+                        qAppUser.firstName.concat(" ").concat(qAppUser.lastName),
+                        qThesisRegistration.schoolName,
+                        qThesisRegistration.grade,
+                        qThesisRegistration.hasDigitalPrototype,
+                        qThesisRegistration.hasInvestorInterest
+                ))
+                .from(qAppUser)
+                .join(qThesisRegistration).on(qAppUser.id.eq(qThesisRegistration.student.id))
+                .where(builder)
+                .offset(page * size)
+                .limit(size)
+                .fetch();
     }
 }

@@ -50,6 +50,31 @@ public class ThesisService {
         tr.setStudentMobile(req.getStudentMobile());
         tr.setParentEmail(req.getParentEmail());
         tr.setParentMobile(req.getParentMobile());
+
+        String topicName = req.getThesisTopic();
+
+        if (req.getThesisId() != null && req.getThesisId() != 0) {
+
+            // Predefined topic → fetch by ID
+            ThesisTopic topic = thesisTopicRepository.findById(req.getThesisId())
+                    .orElseThrow(() -> new RuntimeException("Invalid topic ID"));
+
+            topicName = topic.getName();
+
+        } else {
+            // OTHER → create if not exists
+            String finalTopicName = topicName;
+            thesisTopicRepository.findByNameIgnoreCase(topicName.trim())
+                    .orElseGet(() -> {
+                        ThesisTopic newTopic = new ThesisTopic();
+                        newTopic.setName(finalTopicName.trim());
+                        return thesisTopicRepository.save(newTopic);
+                    });
+        }
+
+        // Always store string in thesis_registration
+        tr.setThesisTopic(topicName);
+
         tr.setThesisTopic(req.getThesisTopic());
         tr.setThesisIntent(req.getThesisIntent());
         tr.setHasDigitalPrototype(req.getHasDigitalPrototype());

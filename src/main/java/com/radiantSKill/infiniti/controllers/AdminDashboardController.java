@@ -91,7 +91,7 @@ public class AdminDashboardController {
     }
 
     // ✅ ALL STUDENTS (no filter)
-    @GetMapping("/students")
+    @GetMapping("/allStudents")
     public ResponseEntity<ApiResponse<List<AdminStudentDTO>>> getStudents(Authentication auth) {
 
         if (auth == null || !auth.isAuthenticated()) {
