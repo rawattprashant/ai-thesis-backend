@@ -2,12 +2,15 @@ package com.radiantSKill.infiniti.controllers;
 
 import com.radiantSKill.infiniti.dto.*;
 import com.radiantSKill.infiniti.services.AdminDashboardService;
+import com.radiantSKill.infiniti.services.AdminDownloadService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -16,6 +19,7 @@ import java.util.List;
 public class AdminDashboardController {
 
     private final AdminDashboardService dashboardService;
+    private final AdminDownloadService adminDownloadService;
 
     // ✅ FILTER API (MAIN)
     @PostMapping("/submissions/filter")
@@ -104,6 +108,38 @@ public class AdminDashboardController {
                         "success",
                         "Students fetched",
                         dashboardService.getStudents()
+                )
+        );
+    }
+
+    //Download API
+    @GetMapping("/admin/student/{studentId}/download")
+    public void downloadStudentZip(
+            @PathVariable Long studentId,
+            HttpServletResponse response
+    ) throws IOException {
+
+        adminDownloadService.downloadStudentZip(studentId, response);
+    }
+
+    @PostMapping("/submissions")
+    public ResponseEntity<?> getAllSubmissions(
+            @RequestBody DashboardFilterRequest filter,
+            @RequestParam int page,
+            @RequestParam int size,
+            Authentication auth
+    ) {
+
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(401)
+                    .body(new ApiResponse<>("error", "Unauthorized", null));
+        }
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        "Submissions fetched",
+                        dashboardService.getAllSubmissions(filter, page, size)
                 )
         );
     }

@@ -7,7 +7,9 @@ import com.radiantSKill.infiniti.dao.AdminDashboardDAO;
 import com.radiantSKill.infiniti.dto.DashboardFilterRequest;
 import com.radiantSKill.infiniti.dto.StudentDashboardDTO;
 import com.radiantSKill.infiniti.entity.QAppUser;
+import com.radiantSKill.infiniti.entity.QStudentSubmissionStore;
 import com.radiantSKill.infiniti.entity.QThesisRegistration;
+import com.radiantSKill.infiniti.entity.StudentSubmissionStore;
 import com.radiantSKill.infiniti.util.Constants;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -84,6 +86,48 @@ public class AdminDashboardDAOImpl implements AdminDashboardDAO {
                 .from(qAppUser)
                 .join(qThesisRegistration).on(qAppUser.id.eq(qThesisRegistration.student.id))
                 .where(builder)
+                .offset(page * size)
+                .limit(size)
+                .fetch();
+    }
+
+    @Override
+    public List<StudentSubmissionStore> getAllSubmissions(
+            DashboardFilterRequest filter,
+            int page,
+            int size
+    ) {
+
+        JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+
+        QStudentSubmissionStore qStore = QStudentSubmissionStore.studentSubmissionStore;
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        // ✅ Status
+        if (filter.getStatus() != null && !filter.getStatus().isBlank()) {
+            builder.and(qStore.overallStatus.containsIgnoreCase(filter.getStatus()));
+        }
+
+        // ✅ Topic
+        if (filter.getTopic() != null && !filter.getTopic().isBlank()) {
+            builder.and(qStore.thesisTopic.containsIgnoreCase(filter.getTopic()));
+        }
+
+        // ✅ Grade
+        if (filter.getGrade() != null && !filter.getGrade().isBlank()) {
+            builder.and(qStore.grade.eq(filter.getGrade()));
+        }
+
+        // ✅ School
+        if (filter.getSchoolName() != null && !filter.getSchoolName().isBlank()) {
+            builder.and(qStore.schoolName.containsIgnoreCase(filter.getSchoolName()));
+        }
+
+        return queryFactory
+                .selectFrom(qStore)
+                .where(builder)
+                .orderBy(qStore.createdAt.desc())
                 .offset(page * size)
                 .limit(size)
                 .fetch();
