@@ -142,4 +142,12 @@ public class AdminDashboardService {
         }).toList();
     }
 
+    public List<StudentSubmissionStore> getAllSubmissions(
+            DashboardFilterRequest filter,
+            int page,
+            int size
+    ) {
+        return adminDashboardDAO.getAllSubmissions(filter, page, size);
+    }
+
 }
