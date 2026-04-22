@@ -2,6 +2,19 @@ server:
   port: 8080
 
 spring:
+  mail:
+    host: smtpout.secureserver.net
+    port: 465
+    username: Kalpesh@radiantskill.com
+    password: Kalpesh@0972
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+          starttls:
+            enable: false
   application:
     name: application-source
 
@@ -69,3 +82,5 @@ management:
     web:
       exposure:
         include: health,info
+
+
