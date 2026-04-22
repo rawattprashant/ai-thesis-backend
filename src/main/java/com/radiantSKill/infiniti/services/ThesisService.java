@@ -404,6 +404,7 @@ public class ThesisService {
 
     public void sendMail(String to, String subject, String message){
         SimpleMailMessage mail = new SimpleMailMessage();
+        mail.setFrom("Kalpesh@radiantskill.com");
         mail.setTo(to);
         mail.setSubject(subject);
         mail.setText(message);
