@@ -34,11 +34,13 @@ public class AdminDashboardService {
 
     public DashboardStatsDTO getStats() {
 
-        Long students = userRepository.count();
+        Long students = userRepository.countByRoles_Name("STUDENT");
 
-        Long schools = 0L;
-        Long prototypes = 0L;
-        Long investible = 0L;
+        Long schools = thesisRegistrationRepository.countDistinctSchoolName();
+
+        Long prototypes = thesisRegistrationRepository.countByHasDigitalPrototypeTrue();
+
+        Long investible = thesisRegistrationRepository.countByHasInvestorInterestTrue();
 
         return new DashboardStatsDTO(
                 students,
@@ -48,106 +50,28 @@ public class AdminDashboardService {
         );
     }
 
-    public Page<StudentSubmissionStore> filter(AdminFilterRequest req) {
+    public AdminDashboardSummaryDTO getSummary() {
 
-        Pageable pageable = PageRequest.of(
-                req.getPage(),
-                req.getSize(),
-                Sort.by("createdAt").descending()
-        );
-
-        return studentSubmissionStoreRepository.findByOverallStatusContainingIgnoreCaseAndThesisTopicContainingIgnoreCaseAndGradeContainingIgnoreCaseAndSchoolNameContainingIgnoreCase(
-                defaultVal(req.getStatus()),
-                defaultVal(req.getTopic()),
-                defaultVal(req.getGrade()),
-                defaultVal(req.getSchoolName()),
-                pageable
-        );
+        return AdminDashboardSummaryDTO.builder()
+                .totalStudents(userRepository.countByRoles_Name("STUDENT"))
+                .totalRegistrations(thesisRegistrationRepository.count())
+                .pocCompleted(proofRepository.count())
+                .financialModelCompleted(financialRepository.count())
+                .presentationsCompleted(presentationRepository.count())
+                .finalSubmissions(selfieRepository.count())
+                .build();
     }
 
-    private String defaultVal(String val) {
-        return val == null ? "" : val;
+    public List<AdminStudentDTO> getAllStudents(int page, int size) {
+        return adminDashboardDAO.getAllStudents(page, size);
     }
 
-    private String resolveStage(AppUser student) {
-
-        if (selfieRepository.findByStudent(student).isPresent()) {
-            return "FINAL_SUBMISSION";
-        }
-
-        if (presentationRepository.findByStudent(student).isPresent()) {
-            return "PRESENTATION";
-        }
-
-        if (financialRepository.findByStudent(student).isPresent()) {
-            return "FINANCIAL_MODEL";
-        }
-
-        if (digitalPrototypeRepository.findByStudent(student).isPresent()) {
-            return "DIGITAL_PROTOTYPE";
-        }
-
-        if (proofRepository.findByStudent(student).isPresent()) {
-            return "PROOF_OF_CONCEPT";
-        }
-
-        if (thesisResearchRepository.findByStudent(student).isPresent()) {
-            return "RESEARCH";
-        }
-
-        if (thesisRegistrationRepository.findByStudent(student).isPresent()) {
-            return "REGISTRATION_COMPLETED";
-        }
-
-        return "NOT_STARTED";
-    }
-
-    public AdminDashboardSummaryDTO getSummary()    {
-
-        AdminDashboardSummaryDTO dto = new AdminDashboardSummaryDTO();
-
-        dto.setTotalStudents(userRepository.countByRoles_Name("STUDENT"));
-        dto.setTotalRegistrations(thesisRegistrationRepository.count());
-        dto.setPocCompleted(proofRepository.count());
-        dto.setFinancialModelCompleted(financialRepository.count());
-        dto.setPresentationsCompleted(presentationRepository.count());
-        dto.setFinalSubmissions(selfieRepository.count());
-
-        return dto;
-    }
-
-    public List<StudentDashboardDTO> getStudents(
+    public List<AdminStudentDTO> getStudentsLight(
             DashboardFilterRequest filter,
             int page,
             int size
     ) {
-
-        return adminDashboardDAO.getStudents(filter,page,size);
-
-    }
-
-    public List<AdminStudentDTO> getStudents() {
-
-        List<AppUser> students = userRepository.findAll(); // filter if needed
-
-        return students.stream().map(user -> {
-            AdminStudentDTO dto = new AdminStudentDTO();
-            dto.setName(user.getFirstName() + " " + user.getLastName());
-            dto.setEmail(user.getEmail());
-            dto.setStatus(user.getStatus());
-
-            dto.setCurrentStage("REGISTERED"); // You can enhance later
-
-            return dto;
-        }).toList();
-    }
-
-    public List<StudentSubmissionStore> getAllSubmissions(
-            DashboardFilterRequest filter,
-            int page,
-            int size
-    ) {
-        return adminDashboardDAO.getAllSubmissions(filter, page, size);
+        return adminDashboardDAO.getStudents(filter, page, size);
     }
 
 }
