@@ -28,10 +28,10 @@ public class ThesisService {
     private final ThesisPresentationRepository thesisPresentationRepository;
     private final SelfieVideoRepository selfieVideoRepository;
     private final FileStorageService fileStorageService;
-    private final JavaMailSender javaMailSender;
     private final ThesisTopicRepository thesisTopicRepository;
     private final StudentSubmissionStoreRepository studentSubmissionStoreRepository;
     private final ThesisResearchRepository repository;
+    private final EmailService emailService;
     /* -------------------------------
        1️⃣ THESIS REGISTRATION
      -------------------------------- */
@@ -118,7 +118,7 @@ public class ThesisService {
         proofOfConceptRepository.save(poc);
 
         if (!"SUBMITTED".equals(oldStatus)) {
-            sendMilestoneEmail(student, "Proof Of Concept");
+            emailService.sendMilestoneEmail(student, "Proof Of Concept");
         }
 
         StudentSubmissionStore store = getStore(student);
@@ -157,7 +157,7 @@ public class ThesisService {
 
         digitalPrototypeRepository.save(dp);
         if (!"SUBMITTED".equals(oldStatus)) {
-            sendMilestoneEmail(student, "Digital Prototype");
+            emailService.sendMilestoneEmail(student, "Digital Prototype");
         }
 
         StudentSubmissionStore store = getStore(student);
@@ -189,7 +189,7 @@ public class ThesisService {
 
         financialModelRepository.save(fm);
         if (!"SUBMITTED".equals(oldStatus)) {
-            sendMilestoneEmail(student, "Financial Model");
+            emailService.sendMilestoneEmail(student, "Financial Model");
         }
 
         StudentSubmissionStore store = getStore(student);
@@ -221,7 +221,7 @@ public class ThesisService {
 
         thesisPresentationRepository.save(tp);
         if (!"SUBMITTED".equals(oldStatus)) {
-            sendMilestoneEmail(student, "Presentation");
+            emailService.sendMilestoneEmail(student, "Presentation");
         }
 
         StudentSubmissionStore store = getStore(student);
@@ -252,7 +252,7 @@ public class ThesisService {
 
         selfieVideoRepository.save(sv);
         if (!"SUBMITTED".equals(oldStatus)) {
-            sendMilestoneEmail(student, "Selfie Video");
+            emailService.sendMilestoneEmail(student, "Selfie Video");
         }
 
         StudentSubmissionStore store = getStore(student);
@@ -402,48 +402,6 @@ public class ThesisService {
                 .toList();
     }
 
-    public void sendMail(String to, String subject, String message){
-        SimpleMailMessage mail = new SimpleMailMessage();
-        mail.setFrom("Kalpesh@radiantskill.com");
-        mail.setTo(to);
-        mail.setSubject(subject);
-        mail.setText(message);
-
-        javaMailSender.send(mail);
-
-    }
-    private void sendMilestoneEmail(AppUser student, String milestoneName) {
-
-        ThesisRegistration reg = ensureRegistrationCompleted(student);
-
-        String studentSubject = "Milestone Completed - " + milestoneName;
-
-        String studentBody =
-                "Dear Student,\n\n" +
-                        "Congratulations! 🎉\n\n" +
-                        "You have successfully completed the \"" + milestoneName + "\" milestone of your thesis project.\n" +
-                        "This is an important step in your academic journey and reflects your dedication and effort.\n\n" +
-                        "Keep working with the same enthusiasm as you move forward to the next milestones.\n\n" +
-                        "Best regards,\n" +
-                        "Team Infiniti";
-
-        // 3. Parent Email Content
-        String parentSubject = "Milestone Update - " + milestoneName + " Completed";
-
-        String parentBody =
-                "Dear Parent,\n\n" +
-                        "We are pleased to inform you that your child has successfully completed the \"" + milestoneName + "\" milestone.\n\n" +
-                        "This achievement marks steady progress in their thesis journey and showcases their commitment.\n\n" +
-                        "We appreciate your continued support and encouragement in helping them reach their goals.\n\n" +
-                        "Best regards,\n" +
-                        "Team Infiniti";
-
-        sendMail(reg.getStudentEmail(), studentSubject, studentBody);
-
-        if (reg.getParentEmail() != null) {
-            sendMail(reg.getParentEmail(), parentSubject, parentBody);
-        }
-    }
     /* -------------------------------
        VALIDATION HELPERS
      -------------------------------- */
@@ -452,7 +410,7 @@ public class ThesisService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    private ThesisRegistration ensureRegistrationCompleted(AppUser student) {
+    ThesisRegistration ensureRegistrationCompleted(AppUser student) {
         return thesisRegistrationRepository.findByStudent(student)
                 .orElseThrow(() -> new RuntimeException("Thesis Registration not completed"));
     }
