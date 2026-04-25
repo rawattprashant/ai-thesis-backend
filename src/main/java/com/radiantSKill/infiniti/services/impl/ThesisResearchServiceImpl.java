@@ -10,6 +10,7 @@ import com.radiantSKill.infiniti.repository.AppUserRepository;
 import com.radiantSKill.infiniti.repository.StudentSubmissionStoreRepository;
 import com.radiantSKill.infiniti.repository.ThesisResearchRepository;
 import com.radiantSKill.infiniti.repository.ThesisTopicRepository;
+import com.radiantSKill.infiniti.services.EmailService;
 import com.radiantSKill.infiniti.services.ThesisResearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class ThesisResearchServiceImpl implements ThesisResearchService {
     private final AppUserRepository userRepository;
 
     private final StudentSubmissionStoreRepository studentSubmissionStoreRepository;
+    private  final EmailService emailService;
 
     @Override
     public void saveOrUpdateResearch(String email, ResearchRequest request) {
@@ -36,7 +38,7 @@ public class ThesisResearchServiceImpl implements ThesisResearchService {
 
         ThesisResearch research = repository.findByStudent(student)
                 .orElse(new ThesisResearch());
-
+        String oldStatus = research.getStatus();
         research.setStudent(student);
         research.setTopic(topic);
         research.setResearchText(sanitize(request.getResearchText()));
@@ -45,6 +47,9 @@ public class ThesisResearchServiceImpl implements ThesisResearchService {
         research.setStatus("SUBMITTED");
 
         repository.save(research);
+        if (!"SUBMITTED".equals(oldStatus)) {
+            emailService.sendMilestoneEmail(student, "Selfie Video");
+        }
 
         StudentSubmissionStore store = getStore(student);
         store.setResearchStatus("COMPLETED");
