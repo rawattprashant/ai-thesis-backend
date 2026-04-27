@@ -12,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 //import javax.validation.Valid;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/student/thesis")
@@ -77,7 +76,7 @@ public class ThesisController {
 
     // get api for presentation
     @GetMapping("/presentation")
-    public ResponseEntity<ApiResponse<ThesisResentationDTO>>getPresentation(
+    public ResponseEntity<ApiResponse<ThesisPresentationDTO>>getPresentation(
             Authentication auth){
         if(auth == null || !auth.isAuthenticated()){
             return ResponseEntity.status(401)
@@ -87,7 +86,7 @@ public class ThesisController {
                 new ApiResponse<>(
                         "success",
                         "Presentation fetched successfully",
-                        thesisService.getRepresentation(auth.getName())
+                        thesisService.getPresentation(auth.getName())
                 )
         );
 
@@ -255,6 +254,7 @@ public class ThesisController {
     // 5️⃣ Thesis Presentation
     @PostMapping(value = "/presentation", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<?>> uploadPresentation(
+            @RequestParam(value = "description", required = false) String description,
             @RequestPart("file") MultipartFile file,
             Authentication auth) {
 
@@ -263,7 +263,7 @@ public class ThesisController {
                     .body(new ApiResponse<>("error", "Unauthorized", null));
         }
 
-        thesisService.uploadPresentation(auth.getName(), file);
+        thesisService.uploadPresentation(auth.getName(), description, file);
 
         return ResponseEntity.ok(
                 new ApiResponse<>("success", "Presentation uploaded", null)

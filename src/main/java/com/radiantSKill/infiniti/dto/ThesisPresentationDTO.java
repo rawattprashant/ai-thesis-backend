@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class ThesisResentationDTO {
+public class ThesisPresentationDTO {
     private String file_url;
     private String status;
     private String description;
