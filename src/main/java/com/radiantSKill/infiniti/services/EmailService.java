@@ -2,6 +2,7 @@ package com.radiantSKill.infiniti.services;
 
 import com.radiantSKill.infiniti.entity.AppUser;
 import com.radiantSKill.infiniti.entity.ThesisRegistration;
+import com.radiantSKill.infiniti.repository.ThesisRegistrationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
@@ -13,8 +14,12 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class EmailService {
     private final JavaMailSender javaMailSender;
-    private final ThesisService thesisService;
+    private final ThesisRegistrationRepository thesisRegistrationRepository;
 
+    ThesisRegistration ensureRegistrationCompleted(AppUser student) {
+        return thesisRegistrationRepository.findByStudent(student)
+                .orElseThrow(() -> new RuntimeException("Thesis Registration not completed"));
+    }
     public void sendMail(String to, String subject, String message){
         SimpleMailMessage mail = new SimpleMailMessage();
         mail.setFrom("Kalpesh@radiantskill.com");
@@ -27,7 +32,7 @@ public class EmailService {
     }
     public void sendMilestoneEmail(AppUser student, String milestoneName) {
 
-        ThesisRegistration reg = thesisService.ensureRegistrationCompleted(student);
+        ThesisRegistration reg = ensureRegistrationCompleted(student);
 
         String studentSubject = "Milestone Completed - " + milestoneName;
 
