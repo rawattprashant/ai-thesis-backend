@@ -24,6 +24,9 @@ public class ThesisPresentation {
     private String fileUrl;
     private String status;
 
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
+
     @CreationTimestamp
     private LocalDateTime uploadedAt;
 }
