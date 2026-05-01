@@ -9,4 +9,7 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     Optional<AppUser> findByEmail(String email);
     long countBy();
     long countByRoles_Name(String roleName);
+
+    boolean existsByEmail(String email);
+
 }

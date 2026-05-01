@@ -30,8 +30,12 @@ public class UserService {
     @Transactional
     public void registerUser(RegisterRequestDTO request) {
 
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("Email already registered");
+        }
+
         Role role = roleRepository.findByName(request.getRole().toUpperCase())
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid role"));
 
         AppUser user = new AppUser();
         user.setFirstName(request.getFirstName());
@@ -56,7 +60,7 @@ public class UserService {
     public UserResponseDTO getUserByEmail(String email) {
 
         AppUser user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
         String role = userDAO.findRoleByUserId(user.getId());
 
         UserResponseDTO dto = new UserResponseDTO();
