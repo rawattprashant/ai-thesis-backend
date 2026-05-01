@@ -29,7 +29,7 @@ public class ThesisService {
     private final FileStorageService fileStorageService;
     private final ThesisTopicRepository thesisTopicRepository;
     private final StudentSubmissionStoreRepository studentSubmissionStoreRepository;
-    private final ThesisResearchRepository repository;
+    private final ThesisResearchRepository thesisResearchRepository;
     private final EmailService emailService;
     /* -------------------------------
        1️⃣ THESIS REGISTRATION
