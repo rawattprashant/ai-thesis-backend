@@ -237,6 +237,7 @@ public class ThesisService {
         tp.setFileUrl(fileUrl);
         tp.setDescription(description);
         tp.setStatus("SUBMITTED");
+        tp.setDescription(description);
 
         thesisPresentationRepository.save(tp);
         if (!"SUBMITTED".equals(oldStatus)) {
