@@ -50,12 +50,12 @@ public class AuthController {
 
         // ✅ fetch user to get role
         AppUser user = appUserRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         String role = user.getRoles()
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Role not found"))
+                .orElseThrow(() -> new IllegalArgumentException("Role not assigned"))
                 .getName();
 
         // ✅ generate token with role

@@ -7,7 +7,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class DashboardStatsDTO {
 
-    private Long students;
+    private Long totalStudents;
     private Long schools;
     private Long prototypes;
     private Long investible;

@@ -73,6 +73,9 @@ springdoc:
 
 logging:
   level:
+    root: INFO
+    com.radiantSKill: DEBUG   # 🔥 THIS IS THE KEY LINE
+
     org.springframework.web: INFO
     org.hibernate.SQL: WARN
     org.hibernate.type.descriptor.sql.BasicBinder: WARN
@@ -82,5 +85,3 @@ management:
     web:
       exposure:
         include: health,info
-
-
