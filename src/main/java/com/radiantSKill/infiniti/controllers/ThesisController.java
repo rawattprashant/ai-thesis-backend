@@ -255,6 +255,7 @@ public class ThesisController {
     // 5️⃣ Thesis Presentation
     @PostMapping(value = "/presentation", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<?>> uploadPresentation(
+            @RequestParam String description,
             @RequestPart("file") MultipartFile file,
             Authentication auth) {
 
@@ -263,7 +264,7 @@ public class ThesisController {
                     .body(new ApiResponse<>("error", "Unauthorized", null));
         }
 
-        thesisService.uploadPresentation(auth.getName(), file);
+        thesisService.uploadPresentation(auth.getName(), file,description);
 
         return ResponseEntity.ok(
                 new ApiResponse<>("success", "Presentation uploaded", null)

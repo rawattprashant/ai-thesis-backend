@@ -23,6 +23,7 @@ public class ThesisPresentation {
 
     private String fileUrl;
     private String status;
+    private String description;
 
     @CreationTimestamp
     private LocalDateTime uploadedAt;

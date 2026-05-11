@@ -204,7 +204,7 @@ public class ThesisService {
     /* -------------------------------
        5️⃣ THESIS PRESENTATION
      -------------------------------- */
-    public void uploadPresentation(String email, MultipartFile file) {
+    public void uploadPresentation(String email, MultipartFile file,String description) {
 
         AppUser student = getStudent(email);
         ensureFinancialModelCompleted(student);
@@ -218,6 +218,7 @@ public class ThesisService {
         tp.setStudent(student);
         tp.setFileUrl(fileUrl);
         tp.setStatus("SUBMITTED");
+        tp.setDescription(description);
 
         thesisPresentationRepository.save(tp);
         if (!"SUBMITTED".equals(oldStatus)) {
@@ -315,6 +316,7 @@ public class ThesisService {
         dto.setStatus(tr.getStatus());
         dto.setFile_url(tr.getFileUrl());
         dto.setUploaded_at(tr.getUploadedAt());
+        dto.setDescription(tr.getDescription());
 
 
         return dto;
