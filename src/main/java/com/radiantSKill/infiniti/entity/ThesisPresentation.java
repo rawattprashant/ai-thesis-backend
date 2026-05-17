@@ -23,7 +23,6 @@ public class ThesisPresentation {
 
     private String fileUrl;
     private String status;
-    private String description;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
