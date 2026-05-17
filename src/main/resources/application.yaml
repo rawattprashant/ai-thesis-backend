@@ -7,14 +7,27 @@ spring:
     port: 465
     username: Kalpesh@radiantskill.com
     password: Kalpesh@0972
+
     properties:
       mail:
         smtp:
           auth: true
+
           ssl:
             enable: true
+            trust: "*"
+
           starttls:
             enable: false
+            required: false
+
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+          socketFactory:
+            fallback: false
+
   application:
     name: application-source
 
