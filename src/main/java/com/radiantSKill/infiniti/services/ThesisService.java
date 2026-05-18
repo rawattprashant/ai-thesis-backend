@@ -92,13 +92,16 @@ public class ThesisService {
 
         // ✅ STORE FINAL VALUE
         tr.setThesisTopic(topicName);
-
+        String oldStatus = tr.getStatus();
         tr.setThesisIntent(req.getThesisIntent());
         tr.setHasDigitalPrototype(req.getHasDigitalPrototype());
         tr.setHasInvestorInterest(req.getHasInvestorInterest());
         tr.setStatus("SUBMITTED");
 
         thesisRegistrationRepository.save(tr);
+        if (!"SUBMITTED".equals(oldStatus)) {
+            emailService.sendRegistrationEmail(student);
+        }
 
         // ✅ STORE (FIXED)
         StudentSubmissionStore store = getStore(student);

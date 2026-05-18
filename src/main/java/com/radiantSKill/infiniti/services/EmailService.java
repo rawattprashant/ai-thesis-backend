@@ -62,4 +62,58 @@ public class EmailService {
             sendMail(reg.getParentEmail(), parentSubject, parentBody);
         }
     }
+    public void sendRegistrationEmail(AppUser student) {
+
+        ThesisRegistration reg = ensureRegistrationCompleted(student);
+
+        // Student Email
+        String studentSubject = "Thesis Registration Successful";
+
+        String studentBody = """
+            Dear Student,
+
+            Congratulations! 🎉
+
+            Your thesis registration has been completed successfully.
+            You are now officially enrolled for the thesis project process.
+
+            This marks the beginning of an important academic journey.
+            Please stay updated with upcoming milestones, reviews,
+            and submission schedules shared by your guide.
+
+            We wish you success and a great learning experience.
+
+            Best regards,
+            Team Infiniti
+            """;
+
+        // Parent Email
+        String parentSubject = "Student Thesis Registration Successful";
+
+        String parentBody = """
+            Dear Parent,
+
+            We are pleased to inform you that your child has
+            successfully completed the thesis registration process.
+
+            They are now officially enrolled for the thesis project journey.
+            This achievement is an important step in their academics.
+
+            Your continued support and encouragement play
+            a valuable role in their success and growth.
+
+            Thank you for being a part of their journey.
+
+            Best regards,
+            Team Infiniti
+            """;
+
+        // Send mail to student
+        sendMail(reg.getStudentEmail(), studentSubject, studentBody);
+
+        // Send mail to parent if available
+        if (reg.getParentEmail() != null && !reg.getParentEmail().isBlank()) {
+            sendMail(reg.getParentEmail(), parentSubject, parentBody);
+        }
+    }
 }
