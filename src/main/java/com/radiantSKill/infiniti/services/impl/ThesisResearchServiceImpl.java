@@ -48,7 +48,7 @@ public class ThesisResearchServiceImpl implements ThesisResearchService {
 
         repository.save(research);
         if (!"SUBMITTED".equals(oldStatus)) {
-            emailService.sendMilestoneEmail(student, "Selfie Video");
+            emailService.sendMilestoneEmail(student, " Reasearch ");
         }
 
         StudentSubmissionStore store = getStore(student);
