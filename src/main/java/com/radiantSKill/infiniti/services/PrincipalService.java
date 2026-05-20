@@ -3,18 +3,24 @@ package com.radiantSKill.infiniti.services;
 
 import com.radiantSKill.infiniti.dto.PrincipalRequestDTO;
 import com.radiantSKill.infiniti.dto.PrincipalResponse;
+import com.radiantSKill.infiniti.dto.PrincipalStatsDTO;
 import com.radiantSKill.infiniti.entity.SchoolPrincipal;
 import com.radiantSKill.infiniti.repository.PrincipalRepository;
+import com.radiantSKill.infiniti.repository.ThesisRegistrationRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
     public class PrincipalService {
 
-        @Autowired
-        private PrincipalRepository repository;
 
-        // Register School (First Time Only)
+    private final  PrincipalRepository repository;
+    private final ThesisRegistrationRepository thesisRegistrationRepository;
+
+
+    // Register School (First Time Only)
         public PrincipalResponse registerSchool(
                 PrincipalRequestDTO dto) {
 
@@ -61,8 +67,47 @@ import org.springframework.stereotype.Service;
             response.setSchoolName(school.getSchoolName());
             response.setSchoolAddress(school.getSchoolAddress());
             response.setPrincipalEmail(school.getPrincipalEmail());
+            response.setRegistered(true);
 
             return response;
         }
+
+        public PrincipalStatsDTO getStats(String schoolName){
+            Long students =
+                    thesisRegistrationRepository
+                            .countBySchoolName(schoolName);
+
+            Long prototypes =
+                    thesisRegistrationRepository
+                            .countBySchoolNameAndHasDigitalPrototypeTrue(
+                                    schoolName
+                            );
+
+            Long investible =
+                    thesisRegistrationRepository
+                            .countBySchoolNameAndHasInvestorInterestTrue(
+                                    schoolName
+                            );
+
+            return new PrincipalStatsDTO(
+                    students,
+                    1L,
+                    prototypes,
+                    investible
+            );
+
+        }
+    public String getSchoolNameByEmail(String email) {
+
+        SchoolPrincipal school =
+                repository
+                        .findByPrincipalEmail(email)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "School not found"
+                                ));
+
+        return school.getSchoolName();
+    }
     }
 

@@ -6,6 +6,7 @@ public class PrincipalResponse {
         private String schoolName;
         private String schoolAddress;
         private String principalEmail;
+        private boolean registered;
 
         // Getters and Setters
 
@@ -48,5 +49,12 @@ public class PrincipalResponse {
         public void setPrincipalEmail(String principalEmail) {
             this.principalEmail = principalEmail;
         }
+
+        public boolean isRegistered() {
+        return registered;}
+
+       public void setRegistered(boolean registered) {
+        this.registered = registered;
+    }
     }
 

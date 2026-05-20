@@ -21,4 +21,16 @@ public interface ThesisRegistrationRepository
     Long countDistinctSchoolName();
 
     Long countByHasDigitalPrototypeTrue();
+
+    // For principal Dashboard
+
+    Long countBySchoolName(String schoolName);
+
+    Long countBySchoolNameAndHasDigitalPrototypeTrue(
+            String schoolName
+    );
+
+    Long countBySchoolNameAndHasInvestorInterestTrue(
+            String schoolName
+    );
 }

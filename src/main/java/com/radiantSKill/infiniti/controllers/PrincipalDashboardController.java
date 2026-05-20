@@ -1,8 +1,6 @@
 package com.radiantSKill.infiniti.controllers;
 
-import com.radiantSKill.infiniti.dto.ApiResponse;
-import com.radiantSKill.infiniti.dto.PrincipalRequestDTO;
-import com.radiantSKill.infiniti.dto.PrincipalResponse;
+import com.radiantSKill.infiniti.dto.*;
 import com.radiantSKill.infiniti.services.PrincipalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,4 +40,29 @@ public class PrincipalDashboardController {
             @PathVariable Long id) {
         return principalService.getSchool(id);
     }
+
+    @GetMapping("/stats")
+    public ResponseEntity<ApiResponse<PrincipalStatsDTO>> getStats(Authentication auth) {
+
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(401)
+                    .body(new ApiResponse<>("error", "Unauthorized", null));
+        }
+        String principalEmail = auth.getName();
+
+        // Fetch school name using email
+        String schoolName =
+                principalService.getSchoolNameByEmail(
+                        principalEmail
+                );
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        "Stats fetched",
+                        principalService.getStats(schoolName)
+                )
+        );
+    }
+
 }
