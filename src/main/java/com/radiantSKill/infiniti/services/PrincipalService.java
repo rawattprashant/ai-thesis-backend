@@ -1,15 +1,16 @@
 package com.radiantSKill.infiniti.services;
 
 
-import com.radiantSKill.infiniti.dto.PrincipalRequestDTO;
-import com.radiantSKill.infiniti.dto.PrincipalResponse;
-import com.radiantSKill.infiniti.dto.PrincipalStatsDTO;
+import com.radiantSKill.infiniti.dao.PrincipalDashboardDAO;
+import com.radiantSKill.infiniti.dto.*;
 import com.radiantSKill.infiniti.entity.SchoolPrincipal;
 import com.radiantSKill.infiniti.repository.PrincipalRepository;
 import com.radiantSKill.infiniti.repository.ThesisRegistrationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
     private final  PrincipalRepository repository;
     private final ThesisRegistrationRepository thesisRegistrationRepository;
+    private final PrincipalDashboardDAO principalDashboardDAO;
 
 
     // Register School (First Time Only)
@@ -108,6 +110,17 @@ import org.springframework.stereotype.Service;
                                 ));
 
         return school.getSchoolName();
+    }
+    public List<PrincipalStudentDTO> getAllStudents(String schoolName,int page, int size) {
+        return principalDashboardDAO.getStudentsBySchool(schoolName,page, size);
+    }
+    public List<PrincipalStudentDTO> getStudentsLight(
+            PrincipalDashboardFilterRequest filter,
+            String schoolName,
+            int page,
+            int size
+    ) {
+        return principalDashboardDAO.getStudents(schoolName,filter, page, size);
     }
     }
 
