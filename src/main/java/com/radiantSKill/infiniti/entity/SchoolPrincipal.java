@@ -25,5 +25,14 @@ public class SchoolPrincipal {
 
     @Column(name = "principal_email", nullable = false, unique = true)
     private String principalEmail;
-}
 
+    @Column(name = "reg_status", nullable = false)
+    private String regStatus = "PENDING";
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "app_user_id",
+            foreignKey = @ForeignKey(name = "fk_school_principal_app_user")
+    )
+    private AppUser appUser;
+}

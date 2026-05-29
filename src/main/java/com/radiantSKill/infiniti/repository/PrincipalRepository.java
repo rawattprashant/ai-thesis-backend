@@ -9,5 +9,6 @@ import java.util.Optional;
             extends JpaRepository<SchoolPrincipal, Long> {
 
         Optional<SchoolPrincipal> findByPrincipalEmail(String email);
+        Optional<SchoolPrincipal> findByAppUser_Id(Long appUserId);
     }
 
