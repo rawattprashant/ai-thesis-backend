@@ -40,6 +40,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/student/**").authenticated()
+                        .requestMatchers("/principal/**").hasRole("PRINCIPAL")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session ->
@@ -88,4 +89,5 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }

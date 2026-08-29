@@ -6,6 +6,7 @@ import com.radiantSKill.infiniti.repository.StudentSubmissionStoreRepository;
 import com.radiantSKill.infiniti.services.AdminDownloadService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -15,6 +16,7 @@ import java.util.zip.ZipOutputStream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AdminDownloadServiceImpl implements AdminDownloadService {
 
     private final AppUserRepository userRepository;
@@ -31,115 +33,168 @@ public class AdminDownloadServiceImpl implements AdminDownloadService {
         StudentSubmissionStore store = storeRepository.findByStudent(student)
                 .orElseThrow(() -> new RuntimeException("Submission not found"));
 
-        String baseFileName = buildBaseFileName(student);
+        String zipName = buildZipName(student);
 
         response.setContentType("application/zip");
-        response.setHeader("Content-Disposition", "attachment; filename=" + baseFileName + ".zip");
+        response.setHeader("Content-Disposition", "attachment; filename=" + zipName);
 
-        ZipOutputStream zipOut = new ZipOutputStream(response.getOutputStream());
+        log.info("Starting ZIP download for studentId={}", studentId);
 
-        // ✅ FILES FROM STORAGE
-        addFile(zipOut, getFileUrl(store.getDigitalPrototype()));
-        addFile(zipOut, getFileUrl(store.getFinancialModel()));
-        addFile(zipOut, getFileUrl(store.getThesisPresentation()));
-        addFile(zipOut, getFileUrl(store.getSelfieVideo()));
+        try (ZipOutputStream zipOut = new ZipOutputStream(response.getOutputStream())) {
 
-        // ✅ POC TEXT FILE
-        if (store.getProofOfConcept() != null) {
-            String content = store.getProofOfConcept().getContent();
-            addTextFile(zipOut,
-                    "Proof Of Concept/" + baseFileName + "_poc.txt",
-                    content);
+            addFile(zipOut, getPresentationPath(store), "presentation/");
+            addFile(zipOut, getSelfiePath(store), "selfie-video/");
+            addFile(zipOut, getPrototypePath(store), "digital-prototype/");
+            addFile(zipOut, getFinancialPath(store), "financial-model/");
+
+            addPocFile(zipOut, store, student);
+            addResearchFiles(zipOut, store, student);
+
+            log.info("ZIP creation completed for studentId={}", studentId);
         }
-
-        // ✅ RESEARCH TEXT FILES
-        if (store.getThesisResearch() != null) {
-            ThesisResearch research = store.getThesisResearch();
-
-            addTextFile(zipOut,
-                    "Research/" + baseFileName + "_research_text.txt",
-                    research.getResearchText());
-
-            addTextFile(zipOut,
-                    "Research/" + baseFileName + "_thoughts_text.txt",
-                    research.getThoughtsText());
-        }
-
-        zipOut.close();
     }
+
+    // ========================= ZIP NAME =========================
+
+    private String buildZipName(AppUser student) {
+        return student.getFirstName() + "_"
+                + student.getLastName() + "_"
+                + student.getId() + "_"
+                + System.currentTimeMillis() + ".zip";
+    }
+
+    // ========================= PATH GETTERS =========================
+
+    private String getPresentationPath(StudentSubmissionStore store) {
+        return store.getThesisPresentation() != null
+                ? store.getThesisPresentation().getFileUrl()
+                : null;
+    }
+
+    private String getSelfiePath(StudentSubmissionStore store) {
+        return store.getSelfieVideo() != null
+                ? store.getSelfieVideo().getFileUrl()
+                : null;
+    }
+
+    private String getPrototypePath(StudentSubmissionStore store) {
+        return store.getDigitalPrototype() != null
+                ? store.getDigitalPrototype().getFileUrl()
+                : null;
+    }
+
+    private String getFinancialPath(StudentSubmissionStore store) {
+        return store.getFinancialModel() != null
+                ? store.getFinancialModel().getFileUrl()
+                : null;
+    }
+
+    // ========================= ADD FILE =========================
+
+    private void addFile(ZipOutputStream zipOut, String dbPath, String folder) {
+
+        if (dbPath == null || dbPath.isBlank()) return;
+
+        try {
+            File file = new File(BASE_PATH + dbPath);
+
+            log.info("Trying file path: {}", file.getAbsolutePath());
+
+            if (!file.exists()) {
+                log.warn("File not found: {}", file.getAbsolutePath());
+                return;
+            }
+
+            String cleanName = file.getName().replaceFirst("^[^_]+_", "");
+
+            ZipEntry entry = new ZipEntry(folder + cleanName);
+            zipOut.putNextEntry(entry);
+
+            try (FileInputStream fis = new FileInputStream(file)) {
+                byte[] buffer = new byte[4096];
+                int len;
+                while ((len = fis.read(buffer)) != -1) {
+                    zipOut.write(buffer, 0, len);
+                }
+            }
+
+            zipOut.closeEntry();
+
+            log.info("File added to ZIP: {}", cleanName);
+
+        } catch (Exception e) {
+            log.error("Error adding file to ZIP: {}", dbPath, e);
+        }
+    }
+
+    // ========================= POC FILE =========================
+
+    private void addPocFile(ZipOutputStream zipOut, StudentSubmissionStore store, AppUser student) {
+
+        try {
+            if (store.getProofOfConcept() == null) return;
+
+            String content = store.getProofOfConcept().getContent();
+            if (content == null || content.isBlank()) return;
+
+            String fileName = buildBaseFileName(student) + ".txt";
+
+            ZipEntry entry = new ZipEntry("Proof Of Concept/" + fileName);
+            zipOut.putNextEntry(entry);
+
+            zipOut.write(content.getBytes(StandardCharsets.UTF_8));
+            zipOut.closeEntry();
+
+            log.info("POC file added");
+
+        } catch (Exception e) {
+            log.error("Error adding POC file", e);
+        }
+    }
+
+    // ========================= RESEARCH FILES =========================
+
+    private void addResearchFiles(ZipOutputStream zipOut, StudentSubmissionStore store, AppUser student) {
+
+        try {
+            if (store.getThesisResearch() == null) return;
+
+            ThesisResearch research = store.getThesisResearch();
+            String baseName = buildBaseFileName(student);
+
+            if (research.getResearchText() != null && !research.getResearchText().isBlank()) {
+
+                ZipEntry entry = new ZipEntry("Research/" + baseName + "_research_text.txt");
+                zipOut.putNextEntry(entry);
+
+                zipOut.write(research.getResearchText().getBytes(StandardCharsets.UTF_8));
+                zipOut.closeEntry();
+
+                log.info("Research text file added");
+            }
+
+            if (research.getThoughtsText() != null && !research.getThoughtsText().isBlank()) {
+
+                ZipEntry entry = new ZipEntry("Research/" + baseName + "_thought_text.txt");
+                zipOut.putNextEntry(entry);
+
+                zipOut.write(research.getThoughtsText().getBytes(StandardCharsets.UTF_8));
+                zipOut.closeEntry();
+
+                log.info("Thoughts text file added");
+            }
+
+        } catch (Exception e) {
+            log.error("Error adding research files", e);
+        }
+    }
+
+    // ========================= COMMON NAME =========================
 
     private String buildBaseFileName(AppUser student) {
         return student.getFirstName() + "_"
                 + student.getLastName() + "_"
                 + student.getId() + "_"
                 + System.currentTimeMillis();
-    }
-
-    private String getFileUrl(Object entity) {
-        if (entity == null) return null;
-        try {
-            return (String) entity.getClass().getMethod("getFileUrl").invoke(entity);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private void addFile(ZipOutputStream zipOut, String dbPath) {
-
-        if (dbPath == null || dbPath.isBlank()) return;
-
-        File file = new File(BASE_PATH + dbPath);
-        if (!file.exists()) return;
-
-        try (FileInputStream fis = new FileInputStream(file)) {
-
-            String cleanFileName = removeUUID(file.getName());
-
-            String relativePath = dbPath.substring("uploads/".length());
-
-            String folderPath = "";
-            int lastSlash = relativePath.lastIndexOf("/");
-            if (lastSlash != -1) {
-                folderPath = relativePath.substring(0, lastSlash + 1);
-            }
-
-            ZipEntry entry = new ZipEntry(folderPath + cleanFileName);
-            zipOut.putNextEntry(entry);
-
-            byte[] buffer = new byte[1024];
-            int len;
-
-            while ((len = fis.read(buffer)) > 0) {
-                zipOut.write(buffer, 0, len);
-            }
-
-            zipOut.closeEntry();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    // ✅ ADD TEXT FILE TO ZIP
-    private void addTextFile(ZipOutputStream zipOut, String path, String content) {
-
-        if (content == null || content.isBlank()) return;
-
-        try {
-            ZipEntry entry = new ZipEntry(path);
-            zipOut.putNextEntry(entry);
-
-            byte[] data = content.getBytes(StandardCharsets.UTF_8);
-            zipOut.write(data, 0, data.length);
-
-            zipOut.closeEntry();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String removeUUID(String filename) {
-        return filename.replaceFirst("^[a-f0-9\\-]{36}_", "");
     }
 }

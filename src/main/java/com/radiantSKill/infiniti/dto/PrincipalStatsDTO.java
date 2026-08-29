@@ -5,11 +5,9 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class DashboardStatsDTO {
-
+public class PrincipalStatsDTO {
     private Long totalStudents;
     private Long schools;
     private Long prototypes;
     private Long investible;
-
 }

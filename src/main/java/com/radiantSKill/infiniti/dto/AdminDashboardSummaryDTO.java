@@ -1,8 +1,10 @@
 package com.radiantSKill.infiniti.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class AdminDashboardSummaryDTO {
     private long totalStudents;
     private long totalRegistrations;
