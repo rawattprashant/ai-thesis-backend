@@ -1,0 +1,11 @@
+package com.radiantSKill.infiniti.repository;
+
+import com.radiantSKill.infiniti.entity.Role;
+//import org.apache.el.stream.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface RoleRepository extends JpaRepository<Role, Long> {
+    Optional<Role> findByName(String name);
+}
